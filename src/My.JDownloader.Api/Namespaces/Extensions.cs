@@ -26,10 +26,10 @@ namespace My.JDownloader.Api.Namespaces
         public bool Install( string extensionId)
         {
             var param = new[] {extensionId};
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/install",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/install",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response?.Data != null && (bool)response.Data;
+            return response;
         }
 
         /// <summary>
@@ -40,10 +40,10 @@ namespace My.JDownloader.Api.Namespaces
         public bool IsEnabled(string className)
         {
             var param = new[] { className };
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/isEnabled",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/isEnabled",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response?.Data != null && (bool)response.Data;
+            return response;
         }
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace My.JDownloader.Api.Namespaces
         public bool IsInstalled( string extensionId)
         {
             var param = new[] { extensionId };
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/isInstalled",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/isInstalled",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response?.Data != null && (bool)response.Data;
+            return response;
         }
 
         /// <summary>
@@ -69,12 +69,10 @@ namespace My.JDownloader.Api.Namespaces
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/list",
+            var response = _ApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
                 param, JDownloaderHandler.LoginObject, true);
 
-            JArray tmp = (JArray)response.Data;
-
-            return tmp.ToObject <ExtensionResponseObject[]>();
+            return response;
 
         }
 

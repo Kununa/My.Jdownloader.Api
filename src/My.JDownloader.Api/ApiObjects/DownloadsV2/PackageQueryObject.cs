@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
+
+namespace My.JDownloader.Api.ApiObjects.DownloadsV2
 {
-    internal class QueryPackagesObject
+    class PackageQueryObject
     {
-        public List<QueryPackagesResponseObject> Data { get; set; }
+        public List<FilePackage> Data { get; set; }
         [JsonProperty(PropertyName = "rid")]
         public int RequestId { get; set; }
     }

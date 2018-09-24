@@ -22,10 +22,8 @@ namespace My.JDownloader.Api.Namespaces
         public bool IsCrawling()
         {
             var response =
-                _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkcrawler/isCrawling", null, JDownloaderHandler.LoginObject);
-            if (response?.Data == null)
-                return false;
-            return (bool) response.Data;
+                _ApiHandler.CallAction<bool>(_Device, "/linkcrawler/isCrawling", null, JDownloaderHandler.LoginObject);
+            return response;
         }
     }
 }

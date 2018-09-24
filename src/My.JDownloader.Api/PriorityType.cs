@@ -1,4 +1,4 @@
-﻿namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
+﻿namespace My.JDownloader.Api
 {
     public enum PriorityType
     {

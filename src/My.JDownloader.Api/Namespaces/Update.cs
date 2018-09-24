@@ -21,9 +21,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if an update is available.</returns>
         public bool IsUpdateAvailable()
         {
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/update/isUpdateAvailable",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/update/isUpdateAvailable",
                 null, JDownloaderHandler.LoginObject, true);
-            return response?.Data != null && (bool)response.Data ;
+
+            return response;
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace My.JDownloader.Api
     {
         private readonly DeviceObject _Device;
         private readonly JDownloaderApiHandler _ApiHandler;
-        
+
         private LoginObject _LoginObject;
 
         private byte[] _LoginSecret;
@@ -28,8 +28,10 @@ namespace My.JDownloader.Api
         public Extraction Extraction;
         public LinkCrawler LinkCrawler;
         public LinkGrabberV2 LinkgrabberV2;
+        public DownloadsV2 DownloadsV2;
         public Update Update;
         public JD Jd;
+        public Toolbar Toolbar;
         public Namespaces.System System;
 
         internal DeviceHandler(DeviceObject device, JDownloaderApiHandler apiHandler, LoginObject LoginObject)
@@ -44,9 +46,11 @@ namespace My.JDownloader.Api
             Extraction = new Extraction(_ApiHandler, _Device);
             LinkCrawler = new LinkCrawler(_ApiHandler, _Device);
             LinkgrabberV2 = new LinkGrabberV2(_ApiHandler, _Device);
+            DownloadsV2 = new DownloadsV2(_ApiHandler, _Device);
             Update = new Update(_ApiHandler, _Device);
             Jd = new JD(_ApiHandler, _Device);
             System = new Namespaces.System(_ApiHandler, _Device);
+            Toolbar = new Toolbar(_ApiHandler, _Device);
             DirectConnect();
         }
 
@@ -56,16 +60,20 @@ namespace My.JDownloader.Api
         private void DirectConnect()
         {
             bool connected = false;
-            foreach (var conInfos in GetDirectConnectionInfos())
+            connected = Connect("http://api.jdownloader.org");
+
+            if (connected == false)
             {
-                if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port)))
+                foreach (var conInfos in GetDirectConnectionInfos())
                 {
-                    connected = true;
-                    break;
+                    if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port)))
+                    {
+                        connected = true;
+                        break;
+                    }
                 }
             }
-            if (connected == false)
-                Connect("http://api.jdownloader.org");
+
         }
 
 
@@ -104,7 +112,7 @@ namespace My.JDownloader.Api
             if (string.IsNullOrEmpty(tmp.Data.ToString()))
                 return new List<DeviceConnectionInfoObject>();
 
-            var jobj = (JObject) tmp.Data;
+            var jobj = (JObject)tmp.Data;
             var deviceConInfos = jobj.ToObject<DeviceConnectionInfoReturnObject>();
 
             return deviceConInfos.Infos;

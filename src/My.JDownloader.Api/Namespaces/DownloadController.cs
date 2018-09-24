@@ -23,7 +23,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull</returns>
         public bool ForceDownload(long[] linkIds, long[] packageIds)
         {
-            var param = new[] {linkIds, packageIds};
+            var param = new[] { linkIds, packageIds };
             var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/forceDownload", param, JDownloaderHandler.LoginObject, true);
             return result != null;
         }
@@ -34,9 +34,9 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current state of the device.</returns>
         public string GetCurrentState()
         {
-            var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/getCurrentState", null, JDownloaderHandler.LoginObject, true);
+            var result = _ApiHandler.CallAction<string>(_Device, "/downloadcontroller/getCurrentState", null, JDownloaderHandler.LoginObject, true);
             if (result != null)
-                return (string)result.Data;
+                return result;
             return "UNKOWN_STATE";
         }
 
@@ -46,10 +46,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The actual download speed.</returns>
         public long GetSpeedInBps()
         {
-            var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/getSpeedInBps", null, JDownloaderHandler.LoginObject, true);
-            if (result != null)
-                return (long)result.Data;
-            return 0;
+            var result = _ApiHandler.CallAction<long>(_Device, "/downloadcontroller/getSpeedInBps", null, JDownloaderHandler.LoginObject, true);
+            return result;
         }
 
         /// <summary>
@@ -58,10 +56,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public bool Start()
         {
-            var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/stop", null, JDownloaderHandler.LoginObject, true);
-            if (result != null)
-                return (bool) result.Data;
-            return false;
+            var result = _ApiHandler.CallAction<bool>(_Device, "/downloadcontroller/start", null, JDownloaderHandler.LoginObject, true);
+            return result;
         }
 
         /// <summary>
@@ -70,10 +66,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public bool Stop()
         {
-            var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/start", null, JDownloaderHandler.LoginObject, true);
-            if (result != null)
-                return (bool)result.Data;
-            return false;
+            var result = _ApiHandler.CallAction<bool>(_Device, "/downloadcontroller/stop", null, JDownloaderHandler.LoginObject, true);
+            return result;
         }
 
         /// <summary>
@@ -83,11 +77,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public bool Pause(bool pause)
         {
-            var param = new[] {pause};
-            var result = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/pause", param, JDownloaderHandler.LoginObject, true);
-            if (result != null)
-                return (bool)result.Data;
-            return false;
+            var param = new[] { pause };
+            var result = _ApiHandler.CallAction<bool>(_Device, "/downloadcontroller/pause", param, JDownloaderHandler.LoginObject, true);
+
+            return result;
         }
 
 

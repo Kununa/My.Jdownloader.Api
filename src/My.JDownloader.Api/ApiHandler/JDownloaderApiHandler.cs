@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Action;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
@@ -16,8 +17,9 @@ namespace My.JDownloader.Api.ApiHandler
 {
     internal class JDownloaderApiHandler
     {
-        private int _RequestId = (int) (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+        private int _RequestId = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
         private string _ApiUrl = "http://api.jdownloader.org";
+        private static HttpClient httpClient;
 
         public void SetApiUrl(string newApiUrl)
         {
@@ -53,11 +55,11 @@ namespace My.JDownloader.Api.ApiHandler
             string response = PostMethod(url, param, key);
             if (response == null)
                 return default(T);
-            return (T) JsonConvert.DeserializeObject(response, typeof(T));
+            return (T)JsonConvert.DeserializeObject(response, typeof(T));
         }
 
         public T CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject,
-            bool decryptResponse = false)
+            bool decryptResponse = true)
         {
             if (device == null)
                 throw new ArgumentNullException("The device can't be null.");
@@ -86,49 +88,68 @@ namespace My.JDownloader.Api.ApiHandler
                 if (decryptResponse)
                 {
                     string tmp = Decrypt(response, loginObject.DeviceEncryptionToken);
-                    return (T) JsonConvert.DeserializeObject(tmp, typeof(T));
+                    var res = (ApiObjects.DefaultReturnObject)JsonConvert.DeserializeObject(tmp, typeof(ApiObjects.DefaultReturnObject));
+                    if (res == null || res.Data == null)
+                        return default(T);
+                    if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                        return ((Newtonsoft.Json.Linq.JObject)res.Data).ToObject<T>();
+                    else if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                        return ((Newtonsoft.Json.Linq.JArray)res.Data).ToObject<T>();
+                    else
+                        return (T)res.Data;
                 }
                 throw new InvalidRequestIdException("The 'RequestId' differs from the 'Requestid' from the query.");
             }
-            return (T) JsonConvert.DeserializeObject(response, typeof(T));
+            return (T)JsonConvert.DeserializeObject(response, typeof(T));
+        }
+
+        private void LoadHttpClient()
+        {
+            if (httpClient == null)
+                httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(10) };
         }
 
         private string PostMethod(string url, string body = "", byte[] ivKey = null)
         {
             try
             {
-                using (var httpClient = new HttpClient())
+                LoadHttpClient();
+                if (!string.IsNullOrEmpty(body))
                 {
-                    if (!string.IsNullOrEmpty(body))
+                    StringContent content = new StringContent(body, Encoding.UTF8, "application/json"/*"application/aesjson-jd"*/);
+                    using (var response = httpClient.PostAsync(url, content).Result)
                     {
-                        StringContent content = new StringContent(body, Encoding.UTF8, "application/aesjson-jd");
-                        using (var response = httpClient.PostAsync(url, content).Result)
+                        if (response != null)
                         {
-                            if (response != null)
-                            {
-                                return response.Content.ReadAsStringAsync().Result;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (var response = httpClient.GetAsync(url).Result)
-                        {
-                            if (response.StatusCode != HttpStatusCode.OK)
-                                return null;
-                            string result = response.Content.ReadAsStringAsync().Result;
-                            if (ivKey != null)
-                            {
-                                result = Decrypt(result, ivKey);
-                            }
-                            return result;
+                            return response.Content.ReadAsStringAsync().Result;
                         }
                     }
                 }
+                else
+                {
+                    using (var response = httpClient.GetAsync(url).Result)
+                    {
+                        if (response.StatusCode != HttpStatusCode.OK)
+                            return null;
+                        string result = response.Content.ReadAsStringAsync().Result;
+                        if (ivKey != null)
+                        {
+                            result = Decrypt(result, ivKey);
+                        }
+                        return result;
+                    }
+                }
+
+                return null;
+            }
+            catch (TaskCanceledException e)
+            {
+                Console.WriteLine(e);
                 return null;
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 return null;
             }
         }
@@ -190,6 +211,11 @@ namespace My.JDownloader.Api.ApiHandler
 
         private string Decrypt(string data, byte[] ivKey)
         {
+            if (data == null)
+            {
+                throw new Exception(
+                    "The data is null. This might happen due to overloading the server.");
+            }
             if (ivKey == null)
             {
                 throw new Exception(

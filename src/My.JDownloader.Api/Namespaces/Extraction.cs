@@ -23,10 +23,10 @@ namespace My.JDownloader.Api.Namespaces
         public bool AddArchivePassword(string password)
         {
             var param = new[] {password};
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extraction/addArchivePassword",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response?.Data != null;
+            return response;
         }
 
         /// <summary>
@@ -37,10 +37,10 @@ namespace My.JDownloader.Api.Namespaces
         public bool CancelExtraction(string controllerId)
         {
             var param = new[] { controllerId };
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extraction/cancelExtraction",
+            var response = _ApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response?.Data != null && (bool)response.Data;
+            return response;
         }
     }
 }

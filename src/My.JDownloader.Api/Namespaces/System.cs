@@ -34,10 +34,9 @@ namespace My.JDownloader.Api.Namespaces
         public StorageInfoReturnObject[] GetStorageInfos(string path)
         {
             var param = new[] {path};
-            var tmp =_ApiHandler.CallAction<DefaultReturnObject>(_Device, "/system/getStorageInfos", param, JDownloaderHandler.LoginObject, true);
-
-            var data = (JArray) tmp?.Data;
-            return data?.ToObject<StorageInfoReturnObject[]>();
+            var tmp =_ApiHandler.CallAction<StorageInfoReturnObject[]>(_Device, "/system/getStorageInfos", param, JDownloaderHandler.LoginObject, true);
+            
+            return tmp;
         }
 
         /// <summary>
