@@ -9,12 +9,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Extensions
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal Extensions(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal Extensions(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -26,8 +24,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> Install(string extensionId)
         {
             var param = new[] { extensionId };
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/install",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extensions/install",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -40,8 +38,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsEnabled(string className)
         {
             var param = new[] { className };
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/isEnabled",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extensions/isEnabled",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -54,8 +52,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsInstalled(string extensionId)
         {
             var param = new[] { extensionId };
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/isInstalled",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extensions/isInstalled",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -69,8 +67,8 @@ namespace My.JDownloader.Api.Namespaces
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
-            var response = await _ApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
 
@@ -85,8 +83,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> SetEnabled(string className, bool enabled)
         {
             var param = new[] { className, enabled.ToString() };
-            var response = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/setEnabled",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/setEnabled",
+                param, JDownloaderHandler.LoginObject);
 
             return response?.Data != null;
         }

@@ -11,12 +11,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class LinkGrabberV2
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal LinkGrabberV2(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal LinkGrabberV2(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -40,8 +38,8 @@ namespace My.JDownloader.Api.Namespaces
             if (jobID == -1)
                 param = null;
 
-            var response = _ApiHandler.CallAction<bool>(_Device, "/linkgrabberv2/abort",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = JDownloaderApiHandler.CallAction<bool>(_Device, "/linkgrabberv2/abort",
+                param, JDownloaderHandler.LoginObject);
 
             return await response;
         }
@@ -61,7 +59,7 @@ namespace My.JDownloader.Api.Namespaces
 
             string json = JsonConvert.SerializeObject(containerObject);
             var param = new[] { json };
-            var response = _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/addContainer",
+            var response = JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/addContainer",
                 param, JDownloaderHandler.LoginObject);
             return response != null;
         }
@@ -80,8 +78,8 @@ namespace My.JDownloader.Api.Namespaces
                 DefaultValueHandling = DefaultValueHandling.Include
             });
             var param = new[] { json };
-            var response = _ApiHandler.CallAction<LinkCollectingJob>(_Device, "/linkgrabberv2/addLinks",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = JDownloaderApiHandler.CallAction<LinkCollectingJob>(_Device, "/linkgrabberv2/addLinks",
+                param, JDownloaderHandler.LoginObject);
             return response.Id;
         }
 
@@ -98,8 +96,8 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new[]
                 {linkId.ToString(), destinationAfterLinkId.ToString(), destinationPackageId.ToString(), variantId};
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkgrabberv2/addVariantCopy",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkgrabberv2/addVariantCopy",
+                param, JDownloaderHandler.LoginObject);
             return response != null;
         }
 
@@ -117,7 +115,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { linkIds, packageIds, action, mode, selection };
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/cleanUp", param,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/cleanUp", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -131,7 +129,7 @@ namespace My.JDownloader.Api.Namespaces
         public bool ClearList()
         {
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/clearList", null,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/clearList", null,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -146,7 +144,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<long> GetChildrenChanged(long structureWatermark)
         {
             var response =
-                _ApiHandler.CallAction<long>(_Device, "/linkgrabberv2/getChildrenChanged", null,
+                JDownloaderApiHandler.CallAction<long>(_Device, "/linkgrabberv2/getChildrenChanged", null,
                     JDownloaderHandler.LoginObject);
 
             return await response;
@@ -158,7 +156,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>An array which contains the download folder history.</returns>
         public async Task<string[]> GetDownloadFolderHistorySelectionBase()
         {
-            var response = _ApiHandler.CallAction<string[]>(_Device,
+            var response = JDownloaderApiHandler.CallAction<string[]>(_Device,
                 "/linkgrabberv2/getDownloadFolderHistorySelectionBase", null, JDownloaderHandler.LoginObject);
 
             return await response;
@@ -174,7 +172,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<Dictionary<string, List<long>>> GetDownloadUrls(long[] links, long afterLinkId, long destPackageId)
         {
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkgrabberv2/getDownloadUrls", null,
+            var response = JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkgrabberv2/getDownloadUrls", null,
                 JDownloaderHandler.LoginObject);
 
             var tmp = (JObject)(await response)?.Data;
@@ -188,8 +186,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<int> GetPackageCount()
         {
             var response =
-                _ApiHandler.CallAction<int>(_Device, "/linkgrabberv2/getPackageCount", null,
-                    JDownloaderHandler.LoginObject, true);
+                JDownloaderApiHandler.CallAction<int>(_Device, "/linkgrabberv2/getPackageCount", null,
+                    JDownloaderHandler.LoginObject);
             return await response;
         }
 
@@ -201,7 +199,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<GetVariantsReturnObject[]> GetVariants(long linkId)
         {
             var response =
-                _ApiHandler.CallAction<GetVariantsReturnObject[]>(_Device, "/linkgrabberv2/getVariants", null,
+                JDownloaderApiHandler.CallAction<GetVariantsReturnObject[]>(_Device, "/linkgrabberv2/getVariants", null,
                     JDownloaderHandler.LoginObject);
 
             return await response;
@@ -214,7 +212,7 @@ namespace My.JDownloader.Api.Namespaces
         public bool IsCollecting()
         {
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/isCollection", null,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/isCollection", null,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -233,7 +231,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds, afterLinkId, destPackageId };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/moveLinks", param,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/moveLinks", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -251,7 +249,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { packageIds, afterDestPackageId };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/movePackages", param,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/movePackages", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -269,7 +267,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { linkIds, packageIds };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/moveToDownloadlist", param,
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/moveToDownloadlist", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -289,8 +287,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds, packageIds, newPackageName, downloadPath };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/movetoNewPackage", param,
-                    JDownloaderHandler.LoginObject, true);
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/movetoNewPackage", param,
+                    JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
             return true;
@@ -307,8 +305,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { json };
 
             var response =
-                await _ApiHandler.CallAction<CrawledLinkObject>(_Device, "/linkgrabberv2/queryLinks", param,
-                    JDownloaderHandler.LoginObject, true).ConfigureAwait(false);
+                await JDownloaderApiHandler.CallAction<CrawledLinkObject>(_Device, "/linkgrabberv2/queryLinks", param,
+                    JDownloaderHandler.LoginObject).ConfigureAwait(false);
             return response?.Data;
         }
 
@@ -323,8 +321,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { json };
 
             var response =
-                _ApiHandler.CallAction<List<CrawledPackage>>(_Device, "/linkgrabberv2/queryPackages", param,
-                    JDownloaderHandler.LoginObject, true);
+                JDownloaderApiHandler.CallAction<List<CrawledPackage>>(_Device, "/linkgrabberv2/queryPackages", param,
+                    JDownloaderHandler.LoginObject);
             return await response;
         }
 
@@ -338,8 +336,8 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { directory, packageIds };
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/linkgrabberv2/setDownloadDirectory", param,
-                    JDownloaderHandler.LoginObject, true);
+                JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/setDownloadDirectory", param,
+                    JDownloaderHandler.LoginObject);
             return response != null;
         }
     }

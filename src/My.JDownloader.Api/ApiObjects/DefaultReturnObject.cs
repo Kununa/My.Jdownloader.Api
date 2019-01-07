@@ -9,7 +9,7 @@ namespace My.JDownloader.Api.ApiObjects
         [JsonProperty(PropertyName = "diffType")]
         public string DiffType { get; set; }
         [JsonProperty(PropertyName = "rid")]
-        public int Rid { get; set; }
+        public long Rid { get; set; }
         [JsonProperty(PropertyName = "diffID")]
         public string DiffID { get; set; }
 

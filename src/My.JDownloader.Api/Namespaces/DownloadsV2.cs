@@ -11,12 +11,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class DownloadsV2
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal DownloadsV2(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal DownloadsV2(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -26,7 +24,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The stop mark as long.</returns>
         public async Task<long> GetStopMark()
         {
-            var response = await _ApiHandler.CallAction<long>(_Device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
+            var response = await JDownloaderApiHandler.CallAction<long>(_Device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -37,7 +35,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns informations about a stop marked link.</returns>
         public async Task<DownloadLink> GetStopMarkedLink()
         {
-            var response = await _ApiHandler.CallAction<DownloadLink>(_Device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
+            var response = await JDownloaderApiHandler.CallAction<DownloadLink>(_Device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -53,8 +51,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { json };
 
             var response =
-                await _ApiHandler.CallAction<List<FilePackage>>(_Device, "/downloadsV2/queryPackages", param,
-                    JDownloaderHandler.LoginObject, true);
+                await JDownloaderApiHandler.CallAction<List<FilePackage>>(_Device, "/downloadsV2/queryPackages", param,
+                    JDownloaderHandler.LoginObject);
             return response;
         }
 
@@ -69,7 +67,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { packageIds, afterDestPackageId };
 
             var response =
-                await _ApiHandler.CallAction<object>(_Device, "/downloadsV2/movePackages", param,
+                await JDownloaderApiHandler.CallAction<object>(_Device, "/downloadsV2/movePackages", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -87,8 +85,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds, packageIds };
 
             var response =
-                await _ApiHandler.CallAction<object>(_Device, "/downloadsV2/removeLinks", param,
-                    JDownloaderHandler.LoginObject, true);
+                await JDownloaderApiHandler.CallAction<object>(_Device, "/downloadsV2/removeLinks", param,
+                    JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
             return true;
@@ -105,8 +103,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { json };
 
             var response =
-                await _ApiHandler.CallAction<List<DownloadLink>>(_Device, "/downloadsV2/queryLinks", param,
-                    JDownloaderHandler.LoginObject, true).ConfigureAwait(false);
+                await JDownloaderApiHandler.CallAction<List<DownloadLink>>(_Device, "/downloadsV2/queryLinks", param,
+                    JDownloaderHandler.LoginObject).ConfigureAwait(false);
             return response;
         }
 

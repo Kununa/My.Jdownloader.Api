@@ -8,6 +8,6 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
     {
         public List<FilePackage> Data { get; set; }
         [JsonProperty(PropertyName = "rid")]
-        public int RequestId { get; set; }
+        public long RequestId { get; set; }
     }
 }

@@ -14,7 +14,6 @@ namespace My.JDownloader.Api
     public class DeviceHandler
     {
         private readonly DeviceObject _Device;
-        private readonly JDownloaderApiHandler _ApiHandler;
 
         private LoginObject _LoginObject;
 
@@ -41,24 +40,23 @@ namespace My.JDownloader.Api
         private bool RunEventListener;
 
 
-        internal DeviceHandler(DeviceObject device, JDownloaderApiHandler apiHandler, LoginObject LoginObject)
+        internal DeviceHandler(DeviceObject device,LoginObject LoginObject)
         {
             _Device = device;
-            _ApiHandler = apiHandler;
             _LoginObject = LoginObject;
 
-            AccountsV2 = new AccountsV2(_ApiHandler, _Device);
-            DownloadController = new DownloadController(_ApiHandler, _Device);
-            Extensions = new Extensions(_ApiHandler, _Device);
-            Extraction = new Extraction(_ApiHandler, _Device);
-            LinkCrawler = new LinkCrawler(_ApiHandler, _Device);
-            LinkgrabberV2 = new LinkGrabberV2(_ApiHandler, _Device);
-            DownloadsV2 = new DownloadsV2(_ApiHandler, _Device);
-            Update = new Update(_ApiHandler, _Device);
-            Jd = new JD(_ApiHandler, _Device);
-            System = new Namespaces.System(_ApiHandler, _Device);
-            Toolbar = new Toolbar(_ApiHandler, _Device);
-            Events = new Events(_ApiHandler, _Device);
+            AccountsV2 = new AccountsV2(_Device);
+            DownloadController = new DownloadController(_Device);
+            Extensions = new Extensions(_Device);
+            Extraction = new Extraction(_Device);
+            LinkCrawler = new LinkCrawler(_Device);
+            LinkgrabberV2 = new LinkGrabberV2(_Device);
+            DownloadsV2 = new DownloadsV2( _Device);
+            Update = new Update( _Device);
+            Jd = new JD( _Device);
+            System = new Namespaces.System( _Device);
+            Toolbar = new Toolbar( _Device);
+            Events = new Events( _Device);
             DirectConnect();
             RunEventListener = true;
             new Task(() => EventListener()).Start();
@@ -101,9 +99,9 @@ namespace My.JDownloader.Api
             //Creating the query for the connection request
             string connectQueryUrl =
                 $"/my/connect?email={HttpUtility.UrlEncode(_LoginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
-            _ApiHandler.SetApiUrl(apiUrl);
+            JDownloaderApiHandler._ApiUrl = apiUrl;
             //Calling the query
-            var response = await _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
 
             //If the response is null the connection was not successfull
             if (response == null)
@@ -122,8 +120,8 @@ namespace My.JDownloader.Api
 
         private async Task<List<DeviceConnectionInfoObject>> GetDirectConnectionInfos()
         {
-            var tmp = await _ApiHandler.CallAction<DeviceConnectionInfoReturnObject>(_Device, "/device/getDirectConnectionInfos",
-                null, _LoginObject, true);
+            var tmp = await JDownloaderApiHandler.CallAction<DeviceConnectionInfoReturnObject>(_Device, "/device/getDirectConnectionInfos",
+                null, _LoginObject);
             if (string.IsNullOrEmpty(tmp.ToString()))
                 return new List<DeviceConnectionInfoObject>();
 

@@ -7,6 +7,6 @@ namespace My.JDownloader.Api.ApiObjects.Devices
         [Newtonsoft.Json.JsonProperty(PropertyName ="list")]
         public List<DeviceObject> Devices { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "rid")]
-        public int RequestId { get; set; }
+        public long RequestId { get; set; }
     }
 }

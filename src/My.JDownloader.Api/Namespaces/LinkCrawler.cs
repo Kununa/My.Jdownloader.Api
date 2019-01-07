@@ -7,12 +7,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class LinkCrawler
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal LinkCrawler(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal LinkCrawler(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -23,7 +21,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsCrawling()
         {
             var response =
-                await _ApiHandler.CallAction<bool>(_Device, "/linkcrawler/isCrawling", null, JDownloaderHandler.LoginObject);
+                await JDownloaderApiHandler.CallAction<bool>(_Device, "/linkcrawler/isCrawling", null, JDownloaderHandler.LoginObject);
             return response;
         }
     }

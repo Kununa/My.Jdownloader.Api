@@ -1,7 +1,6 @@
 ﻿using My.JDownloader.Api.ApiObjects.Action;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
-using My.JDownloader.Api.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -18,8 +17,7 @@ namespace My.JDownloader.Api.ApiHandler
 {
     internal class JDownloaderApiHandler
     {
-        private int _RequestId = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-        private string _ApiUrl = "http://api.jdownloader.org";
+        public static string _ApiUrl = "http://api.jdownloader.org";
         private static HttpClient httpClient = new HttpClient(new RetryHandler(new HttpClientHandler())) { Timeout = TimeSpan.FromSeconds(10) };
         private static HttpClient eventHttpClient = new HttpClient(new RetryHandler(new HttpClientHandler()));
 
@@ -28,7 +26,7 @@ namespace My.JDownloader.Api.ApiHandler
             _ApiUrl = newApiUrl;
         }
 
-        public async Task<T> CallServer<T>(string query, byte[] key, string param = "")
+        public static async Task<T> CallServer<T>(string query, byte[] key, string param = "")
         {
             string rid;
             if (!string.IsNullOrEmpty(param))
@@ -37,7 +35,7 @@ namespace My.JDownloader.Api.ApiHandler
                 {
                     param = Encrypt(param, key);
                 }
-                rid = _RequestId.ToString();
+                rid = GetUniqueRid().ToString();
             }
             else
             {
@@ -57,11 +55,14 @@ namespace My.JDownloader.Api.ApiHandler
             string response = await PostMethod(url, param, key).ConfigureAwait(false);
             if (response == null)
                 return default(T);
+            dynamic jsonResponse = JsonConvert.DeserializeObject(response);
+            if (rid != jsonResponse?.rid.ToString() ?? "")
+                throw new Exceptions.InvalidRequestIdException("The 'RequestId' differs from the 'Requestid' from the query.");
             return (T)JsonConvert.DeserializeObject(response, typeof(T));
         }
 
-        public async Task<T> CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject,
-            bool decryptResponse = true, bool eventListener = false)
+        public static async Task<T> CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject,
+            bool eventListener = false)
         {
             if (device == null)
                 throw new ArgumentNullException("The device can't be null.");
@@ -84,35 +85,31 @@ namespace My.JDownloader.Api.ApiHandler
             json = Encrypt(json, loginObject.DeviceEncryptionToken);
             string response = await PostMethod(url, json, loginObject.DeviceEncryptionToken, eventListener).ConfigureAwait(false);
 
-            if (response == null || !response.Contains(callActionObject.RequestId.ToString()))
+            if (response == null)
+                return default(T);
+
+            string tmp = Decrypt(response, loginObject.DeviceEncryptionToken);
+            if (tmp == null)
+                return default(T);
+            //special case as event responses are completly differerent
+            if (tmp.Contains("subscriptionid"))
             {
-                if (decryptResponse)
-                {
-                    string tmp = Decrypt(response, loginObject.DeviceEncryptionToken);
-                    if (tmp == null)
-                        return default(T);
-                    if (tmp.Contains("subscriptionid"))
-                    {
-                        var direct = (T)JsonConvert.DeserializeObject(tmp, typeof(T));
-                        if (direct != null)
-                            return direct;
-                    }
-                    var res = (ApiObjects.DefaultReturnObject)JsonConvert.DeserializeObject(tmp, typeof(ApiObjects.DefaultReturnObject));
-                    if (res == null || res.Data == null)
-                        return default(T);
-                    if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JObject))
-                        return ((Newtonsoft.Json.Linq.JObject)res.Data).ToObject<T>();
-                    else if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
-                        return ((Newtonsoft.Json.Linq.JArray)res.Data).ToObject<T>();
-                    else
-                        return (T)res.Data;
-                }
-                throw new InvalidRequestIdException("The 'RequestId' differs from the 'Requestid' from the query.");
+                var direct = (T)JsonConvert.DeserializeObject(tmp, typeof(T));
+                if (direct != null)
+                    return direct;
             }
-            return (T)JsonConvert.DeserializeObject(response, typeof(T));
+            var res = (ApiObjects.DefaultReturnObject)JsonConvert.DeserializeObject(tmp, typeof(ApiObjects.DefaultReturnObject));
+            if (res == null || res.Data == null)
+                return default(T);
+            if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                return ((Newtonsoft.Json.Linq.JObject)res.Data).ToObject<T>();
+            else if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                return ((Newtonsoft.Json.Linq.JArray)res.Data).ToObject<T>();
+            else
+                return (T)res.Data;
         }
 
-        private async Task<string> PostMethod(string url, string body = "", byte[] ivKey = null, bool eventListener = false)
+        private static async Task<string> PostMethod(string url, string body = "", byte[] ivKey = null, bool eventListener = false)
         {
             try
             {
@@ -158,7 +155,7 @@ namespace My.JDownloader.Api.ApiHandler
 
         #region "Encrypt, Decrypt and Signature"
 
-        private string GetSignature(string data, byte[] key)
+        private static string GetSignature(string data, byte[] key)
         {
             if (key == null)
             {
@@ -173,7 +170,7 @@ namespace My.JDownloader.Api.ApiHandler
             return binaryString.ToLower();
         }
 
-        private string Encrypt(string data, byte[] ivKey)
+        private static string Encrypt(string data, byte[] ivKey)
         {
             if (ivKey == null)
             {
@@ -211,7 +208,7 @@ namespace My.JDownloader.Api.ApiHandler
             return Convert.ToBase64String(encrypted);
         }
 
-        private string Decrypt(string data, byte[] ivKey)
+        private static string Decrypt(string data, byte[] ivKey)
         {
             if (data == null)
             {
@@ -258,17 +255,15 @@ namespace My.JDownloader.Api.ApiHandler
 
         #endregion
 
-        private int GetUniqueRid()
+        private static long GetUniqueRid()
         {
-            return _RequestId++;
+            double d = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            return (long)d;
         }
     }
 
     public class RetryHandler : DelegatingHandler
     {
-        // Strongly consider limiting the number of retries - "retry forever" is
-        // probably not the most user friendly way you could respond to "the
-        // network cable got pulled out."
         private const int MaxRetries = 3;
 
         public RetryHandler(HttpMessageHandler innerHandler)

@@ -7,6 +7,6 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
     {
         public List<CrawledPackage> Data { get; set; }
         [JsonProperty(PropertyName = "rid")]
-        public int RequestId { get; set; }
+        public long RequestId { get; set; }
     }
 }

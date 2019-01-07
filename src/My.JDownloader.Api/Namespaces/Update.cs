@@ -7,12 +7,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Update
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal Update(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal Update(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -22,8 +20,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if an update is available.</returns>
         public async Task<bool> IsUpdateAvailable()
         {
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/update/isUpdateAvailable",
-                null, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/update/isUpdateAvailable",
+                null, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -33,8 +31,8 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartAndUpdate()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/update/restartAndUpdate",
-                null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/update/restartAndUpdate",
+                null, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -42,8 +40,8 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RunUpdateCheck()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/update/runUpdateCheck",
-                null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/update/runUpdateCheck",
+                null, JDownloaderHandler.LoginObject);
         }
     }
 }

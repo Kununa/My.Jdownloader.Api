@@ -9,12 +9,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class System
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal System(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal System(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -23,7 +21,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task ExitJd()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/system/exitJD", null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/exitJD", null, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -34,7 +32,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<StorageInfoReturnObject[]> GetStorageInfos(string path)
         {
             var param = new[] { path };
-            var tmp = await _ApiHandler.CallAction<StorageInfoReturnObject[]>(_Device, "/system/getStorageInfos", param, JDownloaderHandler.LoginObject, true);
+            var tmp = await JDownloaderApiHandler.CallAction<StorageInfoReturnObject[]>(_Device, "/system/getStorageInfos", param, JDownloaderHandler.LoginObject);
 
             return tmp;
         }
@@ -45,7 +43,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<SystemInfoReturnObject> GetSystemInfos()
         {
-            return await _ApiHandler.CallAction<SystemInfoReturnObject>(_Device, "/system/getSystemInfos", null, JDownloaderHandler.LoginObject, true);
+            return await JDownloaderApiHandler.CallAction<SystemInfoReturnObject>(_Device, "/system/getSystemInfos", null, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task HibernateOS()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/system/hibernateOS", null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/hibernateOS", null, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -61,7 +59,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartJd()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/system/restartJD", null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/restartJD", null, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -70,7 +68,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="force">True if you want to force the shutdown process.</param>
         public async Task ShutdownOS(bool force)
         {
-            await _ApiHandler.CallAction<object>(_Device, "/system/shutdownOS", new[] { force }, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/shutdownOS", new[] { force }, JDownloaderHandler.LoginObject);
         }
 
         /// <summary>
@@ -78,7 +76,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task StandbyOS()
         {
-            await _ApiHandler.CallAction<object>(_Device, "/system/standbyOS", null, JDownloaderHandler.LoginObject, true);
+            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/standbyOS", null, JDownloaderHandler.LoginObject);
         }
     }
 }

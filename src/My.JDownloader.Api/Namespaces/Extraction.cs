@@ -7,12 +7,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Extraction
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal Extraction(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal Extraction(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -24,8 +22,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> AddArchivePassword(string password)
         {
             var param = new[] {password};
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -38,8 +36,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> CancelExtraction(string controllerId)
         {
             var param = new[] { controllerId };
-            var response = await _ApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
+                param, JDownloaderHandler.LoginObject);
 
             return response;
         }

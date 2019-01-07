@@ -8,7 +8,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "regaintoken")]
         public string RegainToken { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "rid")]
-        public int RequestId { get; set; }
+        public long RequestId { get; set; }
 
         public string Email { get; set; }
         public string Password { get; set; }

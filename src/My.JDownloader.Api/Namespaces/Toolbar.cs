@@ -12,12 +12,10 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Toolbar
     {
-        private readonly JDownloaderApiHandler _ApiHandler;
         private readonly DeviceObject _Device;
 
-        internal Toolbar(JDownloaderApiHandler apiHandler, DeviceObject device)
+        internal Toolbar(DeviceObject device)
         {
-            _ApiHandler = apiHandler;
             _Device = device;
         }
 
@@ -27,7 +25,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleAutomaticReconnect()
         {
-            var tmp = await _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleAutomaticReconnect", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await JDownloaderApiHandler.CallAction<bool>(_Device, "/toolbar/toggleAutomaticReconnect", null, JDownloaderHandler.LoginObject);
 
             return tmp;
         }
@@ -38,7 +36,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleDownloadSpeedLimit()
         {
-            var tmp = await _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleDownloadSpeedLimit", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await JDownloaderApiHandler.CallAction<bool>(_Device, "/toolbar/toggleDownloadSpeedLimit", null, JDownloaderHandler.LoginObject);
 
             return tmp;
         }
@@ -49,7 +47,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<StatusObject> GetStatus()
         {
-            var tmp = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/toolbar/getStatus", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/toolbar/getStatus", null, JDownloaderHandler.LoginObject);
 
             var data = (JObject)tmp?.Data;
             return data?.ToObject<StatusObject>();

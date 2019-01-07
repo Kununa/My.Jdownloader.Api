@@ -17,7 +17,7 @@ namespace My.JDownloader.Api
         private byte[] _DeviceSecret;
 
         
-        private readonly JDownloaderApiHandler _ApiHandler = new JDownloaderApiHandler();
+        //private readonly JDownloaderApiHandler JDownloaderApiHandler = new JDownloaderApiHandler();
         
         /// <summary>
         /// 
@@ -43,12 +43,12 @@ namespace My.JDownloader.Api
 
         private void InitializeClasses()
         {
-            //AccountsV2 = new AccountsV2(_ApiHandler);
-            //DownloadController = new DownloadController(_ApiHandler);
-            //Extensions = new Extensions(_ApiHandler);
-            //Extraction = new Extraction(_ApiHandler);
-            //LinkgrabberV2 = new LinkgrabberV2(_ApiHandler);
-            //Update = new Update(_ApiHandler);
+            //AccountsV2 = new AccountsV2(JDownloaderApiHandler);
+            //DownloadController = new DownloadController(JDownloaderApiHandler);
+            //Extensions = new Extensions(JDownloaderApiHandler);
+            //Extraction = new Extraction(JDownloaderApiHandler);
+            //LinkgrabberV2 = new LinkgrabberV2(JDownloaderApiHandler);
+            //Update = new Update(JDownloaderApiHandler);
         }
 
         #region "Connection methods"
@@ -70,7 +70,7 @@ namespace My.JDownloader.Api
                 $"/my/connect?email={HttpUtility.UrlEncode(email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
 
             //Calling the query
-            var response = await _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret).ConfigureAwait(false);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret).ConfigureAwait(false);
 
             //If the response is null the connection was not successfull
             if (response == null)
@@ -94,7 +94,7 @@ namespace My.JDownloader.Api
         {
             string query =
                 $"/my/reconnect?appkey{HttpUtility.UrlEncode(Utils.AppKey)}&sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}&regaintoken={HttpUtility.UrlEncode(LoginObject.RegainToken)}";
-            var response = await _ApiHandler.CallServer<LoginObject>(query, LoginObject.ServerEncryptionToken);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return false;
 
@@ -112,7 +112,7 @@ namespace My.JDownloader.Api
         public bool Disconnect()
         {
             string query = $"/my/disconnect?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
-            var response = _ApiHandler.CallServer<object>(query, LoginObject.ServerEncryptionToken);
+            var response = JDownloaderApiHandler.CallServer<object>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return false;
 
@@ -130,7 +130,7 @@ namespace My.JDownloader.Api
         {
             List<DeviceObject> devices = new List<DeviceObject>();
             string query = $"/my/listdevices?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
-            var response = await _ApiHandler.CallServer<DeviceJsonReturnObject>(query, LoginObject.ServerEncryptionToken);
+            var response = await JDownloaderApiHandler.CallServer<DeviceJsonReturnObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return devices;
 
@@ -153,9 +153,9 @@ namespace My.JDownloader.Api
             if (IsConnected)
             {
                 //TODO: Make it possible to directly connect to the jdownloader client. If it's not working use the relay server.
-                //var tmp = _ApiHandler.CallAction<DefaultReturnObject>(device, "/device/getDirectConnectionInfos",
+                //var tmp = JDownloaderApiHandler.CallAction<DefaultReturnObject>(device, "/device/getDirectConnectionInfos",
                 //    null, LoginObject, true);
-                return new DeviceHandler(device, _ApiHandler, LoginObject);
+                return new DeviceHandler(device, LoginObject);
             }
             return null;
         }

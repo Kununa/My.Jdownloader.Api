@@ -7,7 +7,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "params")]
         public object Params { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName ="rid")]
-        public int RequestId { get; set; }
+        public long RequestId { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "ApiVer")]
         public int ApiVer { get; set; }
     }
