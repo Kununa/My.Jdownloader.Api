@@ -5,6 +5,7 @@ using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.LinkgrabberV2;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -23,9 +24,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Aborts the linkgrabber process.
         /// </summary>
         /// <returns>True if successfull.</returns>
-        public bool Abort()
+        public async Task<bool> Abort()
         {
-            return Abort(-1);
+            return await Abort(-1);
         }
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="jobID">The jobId you wnat to abort.</param>
         /// <returns>True if successfull.</returns>
-        public bool Abort(long jobID)
+        public async Task<bool> Abort(long jobID)
         {
             var param = new[] { jobID };
             if (jobID == -1)
@@ -42,7 +43,7 @@ namespace My.JDownloader.Api.Namespaces
             var response = _ApiHandler.CallAction<bool>(_Device, "/linkgrabberv2/abort",
                 param, JDownloaderHandler.LoginObject, true);
 
-            return response;
+            return await response;
         }
 
         /// <summary>
@@ -142,25 +143,25 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="structureWatermark"></param>
         /// <returns></returns>
-        public long GetChildrenChanged(long structureWatermark)
+        public async Task<long> GetChildrenChanged(long structureWatermark)
         {
             var response =
                 _ApiHandler.CallAction<long>(_Device, "/linkgrabberv2/getChildrenChanged", null,
                     JDownloaderHandler.LoginObject);
 
-            return response;
+            return await response;
         }
 
         /// <summary>
         /// Gets the selection base of the download folder history.
         /// </summary>
         /// <returns>An array which contains the download folder history.</returns>
-        public string[] GetDownloadFolderHistorySelectionBase()
+        public async Task<string[]> GetDownloadFolderHistorySelectionBase()
         {
             var response = _ApiHandler.CallAction<string[]>(_Device,
                 "/linkgrabberv2/getDownloadFolderHistorySelectionBase", null, JDownloaderHandler.LoginObject);
 
-            return response;
+            return await response;
         }
 
         // TODO: Describe what this function does.
@@ -171,12 +172,12 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="afterLinkId"></param>
         /// <param name="destPackageId"></param>
         /// <returns></returns>
-        public Dictionary<string, List<long>> GetDownloadUrls(long[] links, long afterLinkId, long destPackageId)
+        public async Task<Dictionary<string, List<long>>> GetDownloadUrls(long[] links, long afterLinkId, long destPackageId)
         {
             var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/linkgrabberv2/getDownloadUrls", null,
                 JDownloaderHandler.LoginObject);
 
-            var tmp = (JObject)response?.Data;
+            var tmp = (JObject)(await response)?.Data;
             return tmp?.ToObject<Dictionary<string, List<long>>>();
         }
 
@@ -184,12 +185,12 @@ namespace My.JDownloader.Api.Namespaces
         /// Checks how many packages are inside the linkcollector.
         /// </summary>
         /// <returns>The amount of links which are in the linkcollector.</returns>
-        public int GetPackageCount()
+        public async Task<int> GetPackageCount()
         {
             var response =
                 _ApiHandler.CallAction<int>(_Device, "/linkgrabberv2/getPackageCount", null,
                     JDownloaderHandler.LoginObject, true);
-            return response;
+            return await response;
         }
 
         /// <summary>
@@ -197,13 +198,13 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="linkId">The link id you want to get the variants of.</param>
         /// <returns>Returns variants of this link.</returns>
-        public GetVariantsReturnObject[] GetVariants(long linkId)
+        public async Task<GetVariantsReturnObject[]> GetVariants(long linkId)
         {
             var response =
                 _ApiHandler.CallAction<GetVariantsReturnObject[]>(_Device, "/linkgrabberv2/getVariants", null,
                     JDownloaderHandler.LoginObject);
 
-            return response;
+            return await response;
         }
 
         /// <summary>
@@ -300,14 +301,14 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="maxResults">Maximum number of return values.</param>
         /// <returns>Returns a list of all links that are currently in the linkcollector list.</returns>
-        public List<QueryLinksResponseObject> QueryLinks(CrawledLinkQuery query)
+        public async Task<List<QueryLinksResponseObject>> QueryLinks(CrawledLinkQuery query)
         {
             string json = JsonConvert.SerializeObject(query);
             var param = new[] { json };
 
             var response =
-                _ApiHandler.CallAction<CrawledLinkObject>(_Device, "/linkgrabberv2/queryLinks", param,
-                    JDownloaderHandler.LoginObject, true);
+                await _ApiHandler.CallAction<CrawledLinkObject>(_Device, "/linkgrabberv2/queryLinks", param,
+                    JDownloaderHandler.LoginObject, true).ConfigureAwait(false);
             return response?.Data;
         }
 
@@ -316,7 +317,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="requestObject">The request object which contains properties to define the return properties.</param>
         /// <returns>Returns a list of all available packages.</returns>
-        public List<CrawledPackage> QueryPackages(CrawledPackageQuery requestObject)
+        public async Task<List<CrawledPackage>> QueryPackages(CrawledPackageQuery requestObject)
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
@@ -324,7 +325,7 @@ namespace My.JDownloader.Api.Namespaces
             var response =
                 _ApiHandler.CallAction<List<CrawledPackage>>(_Device, "/linkgrabberv2/queryPackages", param,
                     JDownloaderHandler.LoginObject, true);
-            return response;
+            return await response;
         }
 
         /// <summary>

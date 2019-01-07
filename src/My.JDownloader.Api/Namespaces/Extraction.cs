@@ -1,6 +1,7 @@
 ﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -20,10 +21,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="password">The password to add.</param>
         /// <returns>True if successfull.</returns>
-        public bool AddArchivePassword(string password)
+        public async Task<bool> AddArchivePassword(string password)
         {
             var param = new[] {password};
-            var response = _ApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -34,10 +35,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="controllerId">The id of the controll you want to cancel.</param>
         /// <returns>True if successfull.</returns>
-        public bool CancelExtraction(string controllerId)
+        public async Task<bool> CancelExtraction(string controllerId)
         {
             var param = new[] { controllerId };
-            var response = _ApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;

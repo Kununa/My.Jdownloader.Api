@@ -5,6 +5,7 @@ using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.DownloadsV2;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -23,9 +24,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the stop mark as long.
         /// </summary>
         /// <returns>The stop mark as long.</returns>
-        public long GetStopMark()
+        public async Task<long> GetStopMark()
         {
-            var response = _ApiHandler.CallAction<long>(_Device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
+            var response = await _ApiHandler.CallAction<long>(_Device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -34,9 +35,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets informations about a stop marked link.
         /// </summary>
         /// <returns>Returns informations about a stop marked link.</returns>
-        public DownloadLink GetStopMarkedLink()
+        public async Task<DownloadLink> GetStopMarkedLink()
         {
-            var response = _ApiHandler.CallAction<DownloadLink>(_Device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
+            var response = await _ApiHandler.CallAction<DownloadLink>(_Device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
 
             return response;
         }
@@ -46,13 +47,13 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="requestObject">The request object which contains properties to define the return properties.</param>
         /// <returns>Returns a list of all available packages.</returns>
-        public List<FilePackage> QueryPackages(PackageQuery requestObject)
+        public async Task<List<FilePackage>> QueryPackages(PackageQuery requestObject)
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
 
             var response =
-                _ApiHandler.CallAction<List<FilePackage>>(_Device, "/downloadsV2/queryPackages", param,
+                await _ApiHandler.CallAction<List<FilePackage>>(_Device, "/downloadsV2/queryPackages", param,
                     JDownloaderHandler.LoginObject, true);
             return response;
         }
@@ -63,12 +64,12 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="packageIds">The ids of the packages you want to move.</param>
         /// <param name="afterDestPackageId">The id of the package you want to move the others to.</param>
         /// <returns>True if successfull.</returns>
-        public bool MovePackages(long[] packageIds, long afterDestPackageId)
+        public async Task<bool> MovePackages(long[] packageIds, long afterDestPackageId)
         {
             var param = new object[] { packageIds, afterDestPackageId };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/downloadsV2/movePackages", param,
+                await _ApiHandler.CallAction<object>(_Device, "/downloadsV2/movePackages", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -81,12 +82,12 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="linkIds">The ids of the links you want to remove.</param>
         /// <param name="packageIds">The ids of the packages you want to remove.</param>
         /// <returns>True if successfull.</returns>
-        public bool RemoveLinks(long[] linkIds, long[] packageIds)
+        public async Task<bool> RemoveLinks(long[] linkIds, long[] packageIds)
         {
             var param = new object[] { linkIds, packageIds };
 
             var response =
-                _ApiHandler.CallAction<object>(_Device, "/downloadsV2/removeLinks", param,
+                await _ApiHandler.CallAction<object>(_Device, "/downloadsV2/removeLinks", param,
                     JDownloaderHandler.LoginObject, true);
             if (response == null)
                 return false;
@@ -98,14 +99,14 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="queryLink">The request object which contains properties to define the return properties.</param>
         /// <returns>Returns a list of all links that are currently in the download list.</returns>
-        public List<DownloadLink> QueryLinks(LinkQuery queryLink)
+        public async Task<List<DownloadLink>> QueryLinks(LinkQuery queryLink)
         {
             string json = JsonConvert.SerializeObject(queryLink);
             var param = new[] { json };
 
             var response =
-                _ApiHandler.CallAction<List<DownloadLink>>(_Device, "/downloadsV2/queryLinks", param,
-                    JDownloaderHandler.LoginObject, true);
+                await _ApiHandler.CallAction<List<DownloadLink>>(_Device, "/downloadsV2/queryLinks", param,
+                    JDownloaderHandler.LoginObject, true).ConfigureAwait(false);
             return response;
         }
 

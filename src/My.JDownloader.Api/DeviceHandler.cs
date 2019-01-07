@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Web;
-using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
+﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
 using My.JDownloader.Api.Namespaces;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
 using Extensions = My.JDownloader.Api.Namespaces.Extensions;
 
 namespace My.JDownloader.Api
@@ -32,7 +33,13 @@ namespace My.JDownloader.Api
         public Update Update;
         public JD Jd;
         public Toolbar Toolbar;
+        public Events Events;
         public Namespaces.System System;
+
+        public event EventHandler<SubscriptionEventArgs> SubscriptionEvent;
+
+        private bool RunEventListener;
+
 
         internal DeviceHandler(DeviceObject device, JDownloaderApiHandler apiHandler, LoginObject LoginObject)
         {
@@ -51,7 +58,16 @@ namespace My.JDownloader.Api
             Jd = new JD(_ApiHandler, _Device);
             System = new Namespaces.System(_ApiHandler, _Device);
             Toolbar = new Toolbar(_ApiHandler, _Device);
+            Events = new Events(_ApiHandler, _Device);
             DirectConnect();
+            RunEventListener = true;
+            new Task(() => EventListener()).Start();
+        }
+
+        ~DeviceHandler()
+        {
+            SubscriptionEvent = null;
+            RunEventListener = false;
         }
 
         /// <summary>
@@ -60,24 +76,23 @@ namespace My.JDownloader.Api
         private void DirectConnect()
         {
             bool connected = false;
-            connected = Connect("http://api.jdownloader.org");
-
-            if (connected == false)
+            foreach (var conInfos in GetDirectConnectionInfos().Result)
             {
-                foreach (var conInfos in GetDirectConnectionInfos())
+                if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port)).Result)
                 {
-                    if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port)))
-                    {
-                        connected = true;
-                        break;
-                    }
+                    connected = true;
+                    break;
                 }
             }
 
+            if (connected == false)
+            {
+                connected = Connect("http://api.jdownloader.org").Result;
+            }
         }
 
 
-        private bool Connect(string apiUrl)
+        private async Task<bool> Connect(string apiUrl)
         {
             //Calculating the Login and Device secret
             _LoginSecret = Utils.GetSecret(_LoginObject.Email, _LoginObject.Password, Utils.ServerDomain);
@@ -88,7 +103,7 @@ namespace My.JDownloader.Api
                 $"/my/connect?email={HttpUtility.UrlEncode(_LoginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
             _ApiHandler.SetApiUrl(apiUrl);
             //Calling the query
-            var response = _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
+            var response = await _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
 
             //If the response is null the connection was not successfull
             if (response == null)
@@ -105,17 +120,36 @@ namespace My.JDownloader.Api
             return true;
         }
 
-        private List<DeviceConnectionInfoObject> GetDirectConnectionInfos()
+        private async Task<List<DeviceConnectionInfoObject>> GetDirectConnectionInfos()
         {
-            var tmp = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/device/getDirectConnectionInfos",
+            var tmp = await _ApiHandler.CallAction<DeviceConnectionInfoReturnObject>(_Device, "/device/getDirectConnectionInfos",
                 null, _LoginObject, true);
-            if (string.IsNullOrEmpty(tmp.Data.ToString()))
+            if (string.IsNullOrEmpty(tmp.ToString()))
                 return new List<DeviceConnectionInfoObject>();
 
-            var jobj = (JObject)tmp.Data;
-            var deviceConInfos = jobj.ToObject<DeviceConnectionInfoReturnObject>();
-
-            return deviceConInfos.Infos;
+            return tmp.Infos;
         }
+
+        private async void EventListener()
+        {
+            while (RunEventListener)
+            {
+                if (Events.SubscriptionIDs.Count > 0)
+                {
+                    foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x)).ToArray()))
+                        foreach (var e in t)
+                        {
+                            SubscriptionEventArgs args = new SubscriptionEventArgs();
+                            args.EventId = e.EventId;
+                            SubscriptionEvent?.Invoke(this, args);
+                        }
+                }
+            }
+        }
+    }
+
+    public class SubscriptionEventArgs : EventArgs
+    {
+        public string EventId { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Toolbar;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -24,9 +25,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Toggles the automatic reconnect function.
         /// </summary>
         /// <returns></returns>
-        public bool ToggleAutomaticReconnect()
+        public async Task<bool> ToggleAutomaticReconnect()
         {
-            var tmp = _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleAutomaticReconnect", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleAutomaticReconnect", null, JDownloaderHandler.LoginObject, true);
 
             return tmp;
         }
@@ -35,9 +36,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Toggles the bandwidth limit.
         /// </summary>
         /// <returns></returns>
-        public bool ToggleDownloadSpeedLimit()
+        public async Task<bool> ToggleDownloadSpeedLimit()
         {
-            var tmp = _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleDownloadSpeedLimit", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await _ApiHandler.CallAction<bool>(_Device, "/toolbar/toggleDownloadSpeedLimit", null, JDownloaderHandler.LoginObject, true);
 
             return tmp;
         }
@@ -46,9 +47,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the current Status of jDowloader
         /// </summary>
         /// <returns></returns>
-        public StatusObject GetStatus()
+        public async Task<StatusObject> GetStatus()
         {
-            var tmp = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/toolbar/getStatus", null, JDownloaderHandler.LoginObject, true);
+            var tmp = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/toolbar/getStatus", null, JDownloaderHandler.LoginObject, true);
 
             var data = (JObject)tmp?.Data;
             return data?.ToObject<StatusObject>();

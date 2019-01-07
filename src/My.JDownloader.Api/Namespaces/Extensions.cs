@@ -3,7 +3,7 @@ using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Extensions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -23,10 +23,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="extensionId">The id of the extension you want to install</param>
         /// <returns>True if successfull</returns>
-        public bool Install( string extensionId)
+        public async Task<bool> Install(string extensionId)
         {
-            var param = new[] {extensionId};
-            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/install",
+            var param = new[] { extensionId };
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/install",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -37,10 +37,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="className">Name/id of the extension.</param>
         /// <returns>True if enabled.</returns>
-        public bool IsEnabled(string className)
+        public async Task<bool> IsEnabled(string className)
         {
             var param = new[] { className };
-            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/isEnabled",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/isEnabled",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -51,10 +51,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="extensionId">The id of the extension you want to install.</param>
         /// <returns>True if successfull</returns>
-        public bool IsInstalled( string extensionId)
+        public async Task<bool> IsInstalled(string extensionId)
         {
             var param = new[] { extensionId };
-            var response = _ApiHandler.CallAction<bool>(_Device, "/extensions/isInstalled",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/extensions/isInstalled",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -65,11 +65,11 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="requestObject">The request object which contains informations about which properties are returned.</param>
         /// <returns>A list of all extensions that are available.</returns>
-        public ExtensionResponseObject[] List( ExtensionRequestObject requestObject)
+        public async Task<ExtensionResponseObject[]> List(ExtensionRequestObject requestObject)
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
-            var response = _ApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
+            var response = await _ApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -82,10 +82,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="className">Name/id of the extension.</param>
         /// <param name="enabled">If true the extension gets enabled else it disables it.</param>
         /// <returns>True if successfull</returns>
-        public bool SetEnabled(string className, bool enabled)
+        public async Task<bool> SetEnabled(string className, bool enabled)
         {
             var param = new[] { className, enabled.ToString() };
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/setEnabled",
+            var response = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/extensions/setEnabled",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response?.Data != null;

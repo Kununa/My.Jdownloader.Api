@@ -1,7 +1,7 @@
-﻿
-using My.JDownloader.Api.ApiHandler;
+﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -19,9 +19,9 @@ namespace My.JDownloader.Api.Namespaces
         /// <summary>
         /// Keep an eye on your JDownloader Client ;)
         /// </summary>
-        public void DoSomethingCool()
+        public async Task DoSomethingCool()
         {
-            var response = _ApiHandler.CallAction<object>(_Device, "/jd/doSomethingCool",
+            var response = await _ApiHandler.CallAction<object>(_Device, "/jd/doSomethingCool",
                 null, JDownloaderHandler.LoginObject, true);
         }
 
@@ -29,9 +29,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the core revision of the jdownloader client.
         /// </summary>
         /// <returns>Returns the core revision of the jdownloader client.</returns>
-        public int GetCoreRevision()
+        public async Task<int> GetCoreRevision()
         {
-            var response = _ApiHandler.CallAction<int>(_Device, "/jd/getCoreRevision",
+            var response = await _ApiHandler.CallAction<int>(_Device, "/jd/getCoreRevision",
                 null, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -41,9 +41,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Refreshes the plugins.
         /// </summary>
         /// <returns>True if successfull.</returns>
-        public bool RefreshPlugins()
+        public async Task<bool> RefreshPlugins()
         {
-            var response = _ApiHandler.CallAction<bool>(_Device, "/jd/refreshPlugins",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/jd/refreshPlugins",
                 null, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -55,10 +55,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="a">First number.</param>
         /// <param name="b">Second number.</param>
         /// <returns>Returns the sum of two numbers.</returns>
-        public int Sum(int a, int b)
+        public async Task<int> Sum(int a, int b)
         {
             var param = new[] {a, b};
-            var response = _ApiHandler.CallAction<int>(_Device, "/jd/sum",
+            var response = await _ApiHandler.CallAction<int>(_Device, "/jd/sum",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -68,9 +68,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the current uptime of the JDownloader client.
         /// </summary>
         /// <returns>The current uptime of the JDownloader client as long.</returns>
-        public long Uptime()
+        public async Task<long> Uptime()
         {
-            var response = _ApiHandler.CallAction<long>(_Device, "/jd/uptime",
+            var response = await _ApiHandler.CallAction<long>(_Device, "/jd/uptime",
                 null, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -80,9 +80,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the version of the JDownloader client.
         /// </summary>
         /// <returns>The current version of the JDownloader client.</returns>
-        public long Version()
+        public async Task<long> Version()
         {
-            var response = _ApiHandler.CallAction<long>(_Device, "/jd/version",
+            var response = await _ApiHandler.CallAction<long>(_Device, "/jd/version",
                 null, JDownloaderHandler.LoginObject, true);
 
             return response;

@@ -1,6 +1,7 @@
 ﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -19,9 +20,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Checks if the client has an update available.
         /// </summary>
         /// <returns>True if an update is available.</returns>
-        public bool IsUpdateAvailable()
+        public async Task<bool> IsUpdateAvailable()
         {
-            var response = _ApiHandler.CallAction<bool>(_Device, "/update/isUpdateAvailable",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/update/isUpdateAvailable",
                 null, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -30,18 +31,18 @@ namespace My.JDownloader.Api.Namespaces
         /// <summary>
         /// Restarts the client and starts the update.
         /// </summary>
-        public void RestartAndUpdate()
+        public async Task RestartAndUpdate()
         {
-            _ApiHandler.CallAction<object>(_Device, "/update/restartAndUpdate",
+            await _ApiHandler.CallAction<object>(_Device, "/update/restartAndUpdate",
                 null, JDownloaderHandler.LoginObject, true);
         }
 
         /// <summary>
         /// Start the update check on the client.
         /// </summary>
-        public void RunUpdateCheck()
+        public async Task RunUpdateCheck()
         {
-            _ApiHandler.CallAction<object>(_Device, "/update/runUpdateCheck",
+            await _ApiHandler.CallAction<object>(_Device, "/update/runUpdateCheck",
                 null, JDownloaderHandler.LoginObject, true);
         }
     }

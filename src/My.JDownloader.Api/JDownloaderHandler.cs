@@ -3,6 +3,7 @@ using System.Web;
 using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api
 {
@@ -35,7 +36,7 @@ namespace My.JDownloader.Api
         /// <param name="appKey">The name of the app. Should be unique!</param>
         public JDownloaderHandler(string email, string password, string appKey)
         {
-            Connect(email, password);
+            Connect(email, password).Wait();
             Utils.AppKey = appKey;
             InitializeClasses();
         }
@@ -58,7 +59,7 @@ namespace My.JDownloader.Api
         /// <param name="email">Email of the User</param>
         /// <param name="password">Password of the User</param>
         /// <returns>Return if the Connection was succesfull</returns>
-        public bool Connect(string email, string password)
+        public async Task<bool> Connect(string email, string password)
         {
             //Calculating the Login and Device secret
             _LoginSecret = Utils.GetSecret(email, password, Utils.ServerDomain);
@@ -69,7 +70,7 @@ namespace My.JDownloader.Api
                 $"/my/connect?email={HttpUtility.UrlEncode(email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
 
             //Calling the query
-            var response = _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
+            var response = await _ApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret).ConfigureAwait(false);
 
             //If the response is null the connection was not successfull
             if (response == null)
@@ -89,11 +90,11 @@ namespace My.JDownloader.Api
         /// Tries to reconnect your client to the api.
         /// </summary>
         /// <returns>True if successfull else false</returns>
-        public bool Reconnect()
+        public async Task<bool> Reconnect()
         {
             string query =
                 $"/my/reconnect?appkey{HttpUtility.UrlEncode(Utils.AppKey)}&sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}&regaintoken={HttpUtility.UrlEncode(LoginObject.RegainToken)}";
-            var response = _ApiHandler.CallServer<LoginObject>(query, LoginObject.ServerEncryptionToken);
+            var response = await _ApiHandler.CallServer<LoginObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return false;
 
@@ -125,11 +126,11 @@ namespace My.JDownloader.Api
         /// Lists all Devices which are currently connected to your my.jdownloader.org account.
         /// </summary>
         /// <returns>Returns a list of your currently connected devices.</returns>
-        public List<DeviceObject> GetDevices()
+        public async Task<List<DeviceObject>> GetDevices()
         {
             List<DeviceObject> devices = new List<DeviceObject>();
             string query = $"/my/listdevices?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
-            var response = _ApiHandler.CallServer<DeviceJsonReturnObject>(query, LoginObject.ServerEncryptionToken);
+            var response = await _ApiHandler.CallServer<DeviceJsonReturnObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return devices;
 

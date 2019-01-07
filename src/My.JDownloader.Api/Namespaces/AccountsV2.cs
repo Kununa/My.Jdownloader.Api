@@ -5,6 +5,7 @@ using My.JDownloader.Api.ApiObjects.AccountV2;
 using My.JDownloader.Api.ApiObjects.Devices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
 {
@@ -83,10 +84,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="hoster">Name of the hoster you want the url from.</param>
         /// <returns>The url of the hoster.</returns>
-        public string GetPremiumHosterUrl(string hoster)
+        public async Task<string> GetPremiumHosterUrl(string hoster)
         {
             var param = new[] {hoster};
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/accountsV2/getPremiumHosterUrl",
+            var response = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/accountsV2/getPremiumHosterUrl",
                 param, JDownloaderHandler.LoginObject, true);
             if (response?.Data != null)
                 return response.Data.ToString();
@@ -98,11 +99,11 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="requestObject">Contains properties like Username (boolean) etc. If set to true the api will return the Username.</param>
         /// <returns>A list of all accounts stored on the device.</returns>
-        public ListAccountResponseObject[] ListAccounts(ListAccountRequestObject requestObject)
+        public async Task<ListAccountResponseObject[]> ListAccounts(ListAccountRequestObject requestObject)
         {
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] {json};
-            var response = _ApiHandler.CallAction<ListAccountResponseObject[]>(_Device, "/accountsV2/listAccounts", param,
+            var response = await _ApiHandler.CallAction<ListAccountResponseObject[]>(_Device, "/accountsV2/listAccounts", param,
                 JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -112,9 +113,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets all basic authorization informations of the client.
         /// </summary>
         /// <returns>A list with all basic authorization informations.</returns>
-        public ListBasicAuthResponseObject[] ListBasicAuth()
+        public async Task<ListBasicAuthResponseObject[]> ListBasicAuth()
         {
-            var response = _ApiHandler.CallAction<ListBasicAuthResponseObject[]>(_Device, "/accountsV2/listBasicAuth", null,
+            var response = await _ApiHandler.CallAction<ListBasicAuthResponseObject[]>(_Device, "/accountsV2/listBasicAuth", null,
                 JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -124,9 +125,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets all available premium hoster names of the client.
         /// </summary>
         /// <returns>A list of all available premium hoster names.</returns>
-        public string[] ListPremiumHoster()
+        public async Task<string[]> ListPremiumHoster()
         {
-            var response = _ApiHandler.CallAction<string[]>(_Device, "/accountsV2/listPremiumHoster", null,
+            var response = await _ApiHandler.CallAction<string[]>(_Device, "/accountsV2/listPremiumHoster", null,
                 JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -136,9 +137,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets all premium hoster names + urls that JDownloader supports.
         /// </summary>
         /// <returns>Returns a dictionary containing the hostername as the key and the url as the value.</returns>
-        public Dictionary<string, string> ListPremiumHosterUrls()
+        public async Task<Dictionary<string, string>> ListPremiumHosterUrls()
         {
-            var response = _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/accountsV2/listPremiumHosterUrls",
+            var response = await _ApiHandler.CallAction<DefaultReturnObject>(_Device, "/accountsV2/listPremiumHosterUrls",
                 null,
                 JDownloaderHandler.LoginObject, true);
             var tmp = ((JObject) response.Data);
@@ -167,10 +168,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="accountIds">The account ids you want to remove.</param>
         /// <returns>True if successfull.</returns>
-        public bool RemoveAccounts(long[] accountIds)
+        public async Task<bool> RemoveAccounts(long[] accountIds)
         {
             var param = new[] {accountIds};
-            var response = _ApiHandler.CallAction<bool>(_Device,"/accountsV2/removeAccounts",
+            var response = await _ApiHandler.CallAction<bool>(_Device,"/accountsV2/removeAccounts",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -181,10 +182,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="basicAuthIds">The basic auth ids you want to remove.</param>
         /// <returns>True if successfull.</returns>
-        public bool RemoveBasicAuths(long[] basicAuthIds)
+        public async Task<bool> RemoveBasicAuths(long[] basicAuthIds)
         {
             var param = new[] {basicAuthIds};
-            var response = _ApiHandler.CallAction<bool>(_Device, "/accountsV2/removeBasicAuths",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/accountsV2/removeBasicAuths",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -197,10 +198,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="email">The old/new email.</param>
         /// <param name="password">The old/new password</param>
         /// <returns>Ture if successfull</returns>
-        public bool SetUsernameAndPassword(long accountId, string email, string password)
+        public async Task<bool> SetUsernameAndPassword(long accountId, string email, string password)
         {
             var param = new[] {accountId.ToString(), email, password};
-            var response = _ApiHandler.CallAction<bool>(_Device, "/accountsV2/setUserNameAndPassword",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/accountsV2/setUserNameAndPassword",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
@@ -211,10 +212,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="requestObject">The updated basic auth informations.</param>
         /// <returns>True if successfull.</returns>
-        public bool UpdateBasicAuth(BasicAuthObject requestObject)
+        public async Task<bool> UpdateBasicAuth(BasicAuthObject requestObject)
         {
             var param = new[] {  JsonConvert.SerializeObject(requestObject)};
-            var response = _ApiHandler.CallAction<bool>(_Device, "/accountsV2/updateBasicAuth",
+            var response = await _ApiHandler.CallAction<bool>(_Device, "/accountsV2/updateBasicAuth",
                 param, JDownloaderHandler.LoginObject, true);
 
             return response;
