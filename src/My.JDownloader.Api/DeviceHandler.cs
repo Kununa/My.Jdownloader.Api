@@ -77,7 +77,7 @@ namespace My.JDownloader.Api
             bool connected = false;
             foreach (var conInfos in GetDirectConnectionInfos().Result)
             {
-                if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port)).Result)
+                if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port), true).Result)
                 {
                     connected = true;
                     break;
@@ -91,7 +91,7 @@ namespace My.JDownloader.Api
         }
 
 
-        private async Task<bool> Connect(string apiUrl)
+        private async Task<bool> Connect(string apiUrl, bool fast = false)
         {
             //Calculating the Login and Device secret
             _LoginSecret = Utils.GetSecret(_LoginObject.Email, _LoginObject.Password, Utils.ServerDomain);
@@ -102,7 +102,7 @@ namespace My.JDownloader.Api
                 $"/my/connect?email={HttpUtility.UrlEncode(_LoginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
             JDownloaderApiHandler._ApiUrl = apiUrl;
             //Calling the query
-            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret, fast: fast);
 
             //If the response is null the connection was not successfull
             if (response == null)
@@ -154,8 +154,12 @@ namespace My.JDownloader.Api
                         foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x))?.ToArray()))
                             foreach (var e in t)
                             {
-                                SubscriptionEventArgs args = new SubscriptionEventArgs();
-                                args.EventId = e.EventId;
+                                SubscriptionEventArgs args = new SubscriptionEventArgs
+                                {
+                                    EventId = e.EventId,
+                                    EventData = e.EventData,
+                                    EventPublisher = e.Publisher
+                                };
                                 SubscriptionEvent?.Invoke(this, args);
                             }
                     }
@@ -172,5 +176,7 @@ namespace My.JDownloader.Api
     public class SubscriptionEventArgs : EventArgs
     {
         public string EventId { get; set; }
+        public string EventData { get; set; }
+        public string EventPublisher { get; set; }
     }
 }

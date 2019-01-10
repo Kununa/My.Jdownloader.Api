@@ -2,6 +2,7 @@
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
 using Newtonsoft.Json;
+using Polly;
 using System;
 using System.IO;
 using System.Linq;
@@ -13,34 +14,33 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
+[assembly: Fody.ConfigureAwait(false)]
+
 namespace My.JDownloader.Api.ApiHandler
 {
     internal class JDownloaderApiHandler
     {
         public static string _ApiUrl = "http://api.jdownloader.org";
-        private static HttpClient httpClient = new HttpClient(new RetryHandler(new HttpClientHandler())) { Timeout = TimeSpan.FromSeconds(10) };
-        private static HttpClient eventHttpClient = new HttpClient(new RetryHandler(new HttpClientHandler()));
+        private static HttpClient httpClient = new HttpClient(); //new HttpClient(new RetryHandler(new HttpClientHandler())) { Timeout = TimeSpan.FromSeconds(10) };
+        static Policy policy = Policy.Handle<Exception>()
+                        .WaitAndRetryAsync(4, retryAttempt =>
+                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        private static HttpClient fastHttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(3) };//new HttpClient(new RetryHandler(new HttpClientHandler()));
 
         public void SetApiUrl(string newApiUrl)
         {
             _ApiUrl = newApiUrl;
         }
 
-        public static async Task<T> CallServer<T>(string query, byte[] key, string param = "")
+        public static async Task<T> CallServer<T>(string query, byte[] key, bool fast = false)
         {
+
             string rid;
-            if (!string.IsNullOrEmpty(param))
+            /*if (!string.IsNullOrEmpty(param) && key != null)
             {
-                if (key != null)
-                {
-                    param = Encrypt(param, key);
-                }
-                rid = GetUniqueRid().ToString();
-            }
-            else
-            {
-                rid = GetUniqueRid().ToString();
-            }
+                param = Encrypt(param, key);
+            }*/
+            rid = GetUniqueRid().ToString();
             if (query.Contains("?"))
                 query += "&";
             else
@@ -50,10 +50,27 @@ namespace My.JDownloader.Api.ApiHandler
             query += "&signature=" + signature;
 
             string url = _ApiUrl + query;
-            if (!string.IsNullOrWhiteSpace(param))
-                param = string.Empty;
-            string response = await PostMethod(url, param, key).ConfigureAwait(false);
-            if (response == null)
+            //if (!string.IsNullOrWhiteSpace(param))
+            //    param = string.Empty;
+            string response = "";
+            try
+            {
+                using (HttpResponseMessage httpResponse = fast ? await fastHttpClient.GetAsync(url) : await policy.ExecuteAsync(() => httpClient.GetAsync(url)))
+                {
+                    if (httpResponse.StatusCode == HttpStatusCode.OK)
+                        response = await httpResponse.Content.ReadAsStringAsync();
+
+                }
+            }
+            catch
+            {
+                return default(T);
+            }
+            if (key != null)
+            {
+                response = Decrypt(response, key);
+            }
+            if (string.IsNullOrEmpty(response))
                 return default(T);
             dynamic jsonResponse = JsonConvert.DeserializeObject(response);
             if (rid != jsonResponse?.rid.ToString() ?? "")
@@ -83,7 +100,7 @@ namespace My.JDownloader.Api.ApiHandler
             string url = _ApiUrl + query;
             string json = JsonConvert.SerializeObject(callActionObject);
             json = Encrypt(json, loginObject.DeviceEncryptionToken);
-            string response = await PostMethod(url, json, loginObject.DeviceEncryptionToken, eventListener).ConfigureAwait(false);
+            string response = await PostMethod(url, json, loginObject.DeviceEncryptionToken, eventListener);
 
             if (response == null)
                 return default(T);
@@ -113,29 +130,16 @@ namespace My.JDownloader.Api.ApiHandler
         {
             try
             {
-                if (!string.IsNullOrEmpty(body))
+
+                if (string.IsNullOrEmpty(body))
+                    return null;
+
+                StringContent content = new StringContent(body, Encoding.UTF8, "application/json"/*"application/aesjson-jd"*/);
+                using (HttpResponseMessage response = eventListener ? await httpClient.PostAsync(url, content) : await policy.ExecuteAsync(() => httpClient.PostAsync(url, content)))
                 {
-                    StringContent content = new StringContent(body, Encoding.UTF8, "application/json"/*"application/aesjson-jd"*/);
-                    using (var response = await (eventListener ? eventHttpClient : httpClient).PostAsync(url, content).ConfigureAwait(false))
+                    if (response != null)
                     {
-                        if (response != null)
-                        {
-                            return await response.Content.ReadAsStringAsync();
-                        }
-                    }
-                }
-                else
-                {
-                    using (var response = await (eventListener ? eventHttpClient : httpClient).GetAsync(url).ConfigureAwait(false))
-                    {
-                        if (response.StatusCode != HttpStatusCode.OK)
-                            return null;
-                        string result = await response.Content.ReadAsStringAsync();
-                        if (ivKey != null)
-                        {
-                            result = Decrypt(result, ivKey);
-                        }
-                        return result;
+                        return await response.Content.ReadAsStringAsync();
                     }
                 }
 

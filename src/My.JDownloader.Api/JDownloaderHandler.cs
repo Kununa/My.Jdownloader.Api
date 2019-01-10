@@ -70,7 +70,7 @@ namespace My.JDownloader.Api
                 $"/my/connect?email={HttpUtility.UrlEncode(email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
 
             //Calling the query
-            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret).ConfigureAwait(false);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret);
 
             //If the response is null the connection was not successfull
             if (response == null)
