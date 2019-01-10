@@ -39,7 +39,6 @@ namespace My.JDownloader.Api
         public event EventHandler<SubscriptionEventArgs> SubscriptionEvent;
         private Timer timer;
         private bool isBusy;
-        private bool RunEventListener;
 
 
         internal DeviceHandler(DeviceObject device, LoginObject LoginObject)
@@ -60,8 +59,6 @@ namespace My.JDownloader.Api
             Toolbar = new Toolbar(_Device);
             Events = new Events(_Device);
             DirectConnect();
-            RunEventListener = true;
-            //new Task(() => EventListener()).Start();
             isBusy = false;
             StartPolling();
         }
@@ -70,7 +67,6 @@ namespace My.JDownloader.Api
         {
             timer.Dispose();
             SubscriptionEvent = null;
-            RunEventListener = false;
         }
 
         /// <summary>
@@ -169,27 +165,6 @@ namespace My.JDownloader.Api
             finally
             {
                 isBusy = false;
-            }
-        }
-
-        private async void EventListener()
-        {
-            while (RunEventListener)
-            {
-                if (Events.SubscriptionIDs.Count > 0)
-                {
-                    try
-                    {
-                        foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x))?.ToArray()))
-                            foreach (var e in t)
-                            {
-                                SubscriptionEventArgs args = new SubscriptionEventArgs();
-                                args.EventId = e.EventId;
-                                SubscriptionEvent?.Invoke(this, args);
-                            }
-                    }
-                    catch { }
-                }
             }
         }
     }
