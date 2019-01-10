@@ -5,6 +5,7 @@ using My.JDownloader.Api.Namespaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Extensions = My.JDownloader.Api.Namespaces.Extensions;
@@ -36,11 +37,12 @@ namespace My.JDownloader.Api
         public Namespaces.System System;
 
         public event EventHandler<SubscriptionEventArgs> SubscriptionEvent;
-
+        private Timer timer;
+        private bool isBusy;
         private bool RunEventListener;
 
 
-        internal DeviceHandler(DeviceObject device,LoginObject LoginObject)
+        internal DeviceHandler(DeviceObject device, LoginObject LoginObject)
         {
             _Device = device;
             _LoginObject = LoginObject;
@@ -51,19 +53,22 @@ namespace My.JDownloader.Api
             Extraction = new Extraction(_Device);
             LinkCrawler = new LinkCrawler(_Device);
             LinkgrabberV2 = new LinkGrabberV2(_Device);
-            DownloadsV2 = new DownloadsV2( _Device);
-            Update = new Update( _Device);
-            Jd = new JD( _Device);
-            System = new Namespaces.System( _Device);
-            Toolbar = new Toolbar( _Device);
-            Events = new Events( _Device);
+            DownloadsV2 = new DownloadsV2(_Device);
+            Update = new Update(_Device);
+            Jd = new JD(_Device);
+            System = new Namespaces.System(_Device);
+            Toolbar = new Toolbar(_Device);
+            Events = new Events(_Device);
             DirectConnect();
             RunEventListener = true;
-            new Task(() => EventListener()).Start();
+            //new Task(() => EventListener()).Start();
+            isBusy = false;
+            StartPolling();
         }
 
         ~DeviceHandler()
         {
+            timer.Dispose();
             SubscriptionEvent = null;
             RunEventListener = false;
         }
@@ -128,19 +133,62 @@ namespace My.JDownloader.Api
             return tmp.Infos;
         }
 
+        private void StartPolling()
+        {
+            if (timer == null)
+            {
+                timer = new Timer(TimerTick, null, 0, 15000);
+            }
+        }
+
+        private async void TimerTick(object state)
+        {
+            if (isBusy == true)
+            {
+                return;
+            }
+
+            try
+            {
+                isBusy = true;
+                if (Events.SubscriptionIDs.Count > 0)
+                {
+                    try
+                    {
+                        foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x))?.ToArray()))
+                            foreach (var e in t)
+                            {
+                                SubscriptionEventArgs args = new SubscriptionEventArgs();
+                                args.EventId = e.EventId;
+                                SubscriptionEvent?.Invoke(this, args);
+                            }
+                    }
+                    catch { }
+                }
+            }
+            finally
+            {
+                isBusy = false;
+            }
+        }
+
         private async void EventListener()
         {
             while (RunEventListener)
             {
                 if (Events.SubscriptionIDs.Count > 0)
                 {
-                    foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x)).ToArray()))
-                        foreach (var e in t)
-                        {
-                            SubscriptionEventArgs args = new SubscriptionEventArgs();
-                            args.EventId = e.EventId;
-                            SubscriptionEvent?.Invoke(this, args);
-                        }
+                    try
+                    {
+                        foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x))?.ToArray()))
+                            foreach (var e in t)
+                            {
+                                SubscriptionEventArgs args = new SubscriptionEventArgs();
+                                args.EventId = e.EventId;
+                                SubscriptionEvent?.Invoke(this, args);
+                            }
+                    }
+                    catch { }
                 }
             }
         }

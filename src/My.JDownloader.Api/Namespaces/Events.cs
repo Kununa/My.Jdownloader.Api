@@ -42,6 +42,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { subscriptionid };
             var response = await JDownloaderApiHandler.CallAction<SubscriptionEventObject[]>(_Device, "/events/listen",
                 param, JDownloaderHandler.LoginObject, true);
+            if (response == null)
+                return new SubscriptionEventObject[0];
 
             return response;
         }
