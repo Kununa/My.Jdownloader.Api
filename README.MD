@@ -1,7 +1,10 @@
-# My.Jdownloader.Api .NET Wrapper by Cr1TiKa7
+# My.Jdownloader.Api .NET Wrapper
 
-This is an simple wrapper for the official My.JDownloader.Api written in c#.
-It's an rewritten and extended version of https://github.com/noone2407/MyJDownloaderApi.
+This is a simple wrapper around the MyJDownloader API.
+
+This started as a fork of https://github.com/Cr1TiKa7/My.Jdownloader.Api, which was 
+based on https://github.com/noone2407/MyJDownloaderApi , but became more independent.
+
 
 Currently it supports: .NET 4.0, .NET 4.5, .NET 4.6 and .NETCore 2.0
 
@@ -29,89 +32,24 @@ For a better overview, the calls are split into different namespaces.
 So far the library contains the following namespaces and methods:
 
 - AccountsV2 | 14/14 calls done
-    - AddAccount(email, password) : boolean
-	- AddBasicAuth(BasicAuthObject) : boolean
-    - DisableAccounts(accountIds) : boolean
-    - EnableAccounts(accountIds) : boolean
-	- GetPremiumHosterUrl(hoster) : string
-    - ListAccounts(ListAccountRequestObject) : ListAccountResponseObject[]
-	- ListBasicAuth() : ListBasicAuthResponseObject[]
-	- ListPremiumHoster() : string[]
-    - ListPremiumHosterUrls() : Dictionary<string, string>
-    - RefreshAccounts(accountIds) : boolean
-    - RemoveAccounts(accountIds) : boolean
-	- RemoveBasicAuths(basicAuthIds) : boolean
-    - SetUsernameAndPassword(accountId, email, password) : boolean
-	- UpdateBasicAuth(BasicAuthObject) : boolean
-	
+  
 - DownloadController | 6/6 calls done
-	- ForceDownload(linkIds[], packageIds[]) : boolean
-    - Start() : boolean
-    - Stop() : boolean
-    - Pause(pause) : boolean
-    - GetCurrentState() : string
-	- GetSpeedInBps() : long
 
 - DownloadsV2 | 2/x calls done
-	- GetStopMark() : long
-	- GetStopMarkedLink() : StopMarkedLinkReturnObject
 	
 - Extensions | 5/5 calls done
-	- Install(extensionId) : boolean
-	- IsEnabled(className) : boolean
-	- IsInstalled(extensionId) : boolean
-	- List(ExtensionRequestObject) : ExtensionResponseObject[]
-	- SetEnabled(className, enabled) : boolean
 
-- Extraction | 2/7 calls done
-	- AddArchivePassword(password) : boolean
-	- CancelExtraction(controllerId) : boolean
+- Extraction | 6/7 calls done
 
 - JD | 6/6 calls done
-	- DoSomethingCool()
-	- GetCoreRevision() : int
-	- RefreshPlugins() : boolean
-	- Sum() : int
-	- Uptime() : long
-	- Version() : long
 	
 - LinkCrawler | 1/1 calls done
-    - IsCrawling() : boolean
     
 - LinkGrabberV2 | 19/30 calls done
-	- Abort() : boolean
-	- Abort(jobId) : boolean
-    - AddLinks(AddLinkRequestObject) : boolean
-    - AddContainer(containerType, content) : boolean
-    - ClearList() : boolean
-	- CleanUp(linkIds, packageIds, action, mode, selection) : boolean
-	- GetChildrenChanged(structureWatermark) : long
-	- GetDownloadFolderHistorySelectionBase() : string[]
-	- GetDownloadUrls(linkIds, afterLinkId, destPackageId) : Dictionary<string, List<long>>
-    - GetPackageCount() : int
-	- GetVariants(linkId) : GetVariantsReturnObject[]
-    - IsCollecting() : boolean
-	- MoveLinks(linkIds, afterLinkId, destPackageId) : boolean
-	- MovePackages(packageIds, afterDestPackageId) : boolean
-	- MoveToDownloadList(linkIds, packageIds) : boolean
-	- MoveToNewPackage(linkIds, packageIds, newPackageName, downloadPath) : boolean
-    - QueryLinks(maxResults) : QueryLinksResponseObject
-	- QueryPackages(QueryPackagesRequestObject) : List<QueryPackagesResponseObject>
-	- SetDownloadDirectory(directory, packageIds[]) : boolean
 	
 - System | 7/7 calls done
-    - ExitJd()
-	- GetStorageInfos(path) : StorageInfoReturnObject[]
-	- GetSystemInfos() : SystemInfoReturnObject
-	- HibernateOS()
-	- RestartJd()
-	- ShutdownOS()
-	- StandbyOS()
 
 - Update | 3/3 calls done
-	- IsUpdateAvailable() : boolean
-	- RestartAndUpdate()
-	- RunUpdateCheck()
 
 #### Samples
 
