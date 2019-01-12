@@ -13,7 +13,7 @@
         public bool Finished { get; set; }
         public string[] Hosts { get; set; }
         public string Name { get; set; }
-        public PriorityType Priority { get; set; }
+        public Enums.PriorityType Priority { get; set; }
         public bool Running { get; set; }
         public string SaveTo { get; set; }
         public long Speed { get; set; }

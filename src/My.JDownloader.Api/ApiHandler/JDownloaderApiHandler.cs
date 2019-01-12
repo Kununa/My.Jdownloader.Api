@@ -21,11 +21,11 @@ namespace My.JDownloader.Api.ApiHandler
     internal class JDownloaderApiHandler
     {
         public static string _ApiUrl = "http://api.jdownloader.org";
-        private static HttpClient httpClient = new HttpClient(); //new HttpClient(new RetryHandler(new HttpClientHandler())) { Timeout = TimeSpan.FromSeconds(10) };
+        private static HttpClient httpClient = new HttpClient();
         static Policy policy = Policy.Handle<Exception>()
                         .WaitAndRetryAsync(4, retryAttempt =>
                         TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-        private static HttpClient fastHttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(3) };//new HttpClient(new RetryHandler(new HttpClientHandler()));
+        private static HttpClient fastHttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(3) };
 
         public void SetApiUrl(string newApiUrl)
         {
@@ -34,24 +34,12 @@ namespace My.JDownloader.Api.ApiHandler
 
         public static async Task<T> CallServer<T>(string query, byte[] key, bool fast = false)
         {
-
-            string rid;
-            /*if (!string.IsNullOrEmpty(param) && key != null)
-            {
-                param = Encrypt(param, key);
-            }*/
-            rid = GetUniqueRid().ToString();
-            if (query.Contains("?"))
-                query += "&";
-            else
-                query += "?";
-            query += "rid=" + rid;
+            string rid = GetUniqueRid().ToString();
+            query += "&rid=" + rid;
             string signature = GetSignature(query, key);
             query += "&signature=" + signature;
 
             string url = _ApiUrl + query;
-            //if (!string.IsNullOrWhiteSpace(param))
-            //    param = string.Empty;
             string response = "";
             try
             {
@@ -59,7 +47,6 @@ namespace My.JDownloader.Api.ApiHandler
                 {
                     if (httpResponse.StatusCode == HttpStatusCode.OK)
                         response = await httpResponse.Content.ReadAsStringAsync();
-
                 }
             }
             catch
@@ -108,6 +95,7 @@ namespace My.JDownloader.Api.ApiHandler
             string tmp = Decrypt(response, loginObject.DeviceEncryptionToken);
             if (tmp == null)
                 return default(T);
+
             //special case as event responses are completly differerent
             if (tmp.Contains("subscriptionid"))
             {
@@ -126,15 +114,14 @@ namespace My.JDownloader.Api.ApiHandler
                 return (T)res.Data;
         }
 
-        private static async Task<string> PostMethod(string url, string body = "", byte[] ivKey = null, bool eventListener = false)
+        private static async Task<string> PostMethod(string url, string body, byte[] ivKey = null, bool eventListener = false)
         {
             try
             {
-
                 if (string.IsNullOrEmpty(body))
                     return null;
 
-                StringContent content = new StringContent(body, Encoding.UTF8, "application/json"/*"application/aesjson-jd"*/);
+                StringContent content = new StringContent(body, Encoding.UTF8, "application/json");
                 using (HttpResponseMessage response = eventListener ? await httpClient.PostAsync(url, content) : await policy.ExecuteAsync(() => httpClient.PostAsync(url, content)))
                 {
                     if (response != null)
@@ -183,17 +170,9 @@ namespace My.JDownloader.Api.ApiHandler
             }
             var iv = new byte[16];
             var key = new byte[16];
-            for (int i = 0; i < 32; i++)
-            {
-                if (i < 16)
-                {
-                    iv[i] = ivKey[i];
-                }
-                else
-                {
-                    key[i - 16] = ivKey[i];
-                }
-            }
+            Array.Copy(ivKey, iv, 16);
+            Array.Copy(ivKey, 16, key, 0, 16);
+
             var rj = new RijndaelManaged
             {
                 Key = key,
@@ -226,17 +205,9 @@ namespace My.JDownloader.Api.ApiHandler
             }
             var iv = new byte[16];
             var key = new byte[16];
-            for (int i = 0; i < 32; i++)
-            {
-                if (i < 16)
-                {
-                    iv[i] = ivKey[i];
-                }
-                else
-                {
-                    key[i - 16] = ivKey[i];
-                }
-            }
+            Array.Copy(ivKey, iv, 16);
+            Array.Copy(ivKey, 16, key, 0, 16);
+
             byte[] cypher = Convert.FromBase64String(data);
             var rj = new RijndaelManaged
             {
@@ -263,32 +234,6 @@ namespace My.JDownloader.Api.ApiHandler
         {
             double d = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
             return (long)d;
-        }
-    }
-
-    public class RetryHandler : DelegatingHandler
-    {
-        private const int MaxRetries = 3;
-
-        public RetryHandler(HttpMessageHandler innerHandler)
-            : base(innerHandler)
-        { }
-
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            HttpResponseMessage response = null;
-            for (int i = 0; i < MaxRetries; i++)
-            {
-                if (i == 2)
-                    Console.WriteLine("2. retry");
-                response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-                if (response.IsSuccessStatusCode)
-                {
-                    return response;
-                }
-            }
-
-            return response;
         }
     }
 }

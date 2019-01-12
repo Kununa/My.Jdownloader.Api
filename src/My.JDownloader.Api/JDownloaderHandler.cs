@@ -26,7 +26,6 @@ namespace My.JDownloader.Api
         public JDownloaderHandler(string appkey)
         {
             Utils.AppKey = appkey;
-            InitializeClasses();
         }
 
         /// <summary>
@@ -38,17 +37,6 @@ namespace My.JDownloader.Api
         {
             Connect(email, password).Wait();
             Utils.AppKey = appKey;
-            InitializeClasses();
-        }
-
-        private void InitializeClasses()
-        {
-            //AccountsV2 = new AccountsV2(JDownloaderApiHandler);
-            //DownloadController = new DownloadController(JDownloaderApiHandler);
-            //Extensions = new Extensions(JDownloaderApiHandler);
-            //Extraction = new Extraction(JDownloaderApiHandler);
-            //LinkgrabberV2 = new LinkgrabberV2(JDownloaderApiHandler);
-            //Update = new Update(JDownloaderApiHandler);
         }
 
         #region "Connection methods"

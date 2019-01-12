@@ -129,3 +129,7 @@ if (_JDownloaderHandler.IsConnected)
     deviceHandler.AccountV2.AddAccount("mega.co.nz", "test123", "test123");
 }
 ``` 
+
+#### Thanks to
+Newtonsoft.Json
+Fody

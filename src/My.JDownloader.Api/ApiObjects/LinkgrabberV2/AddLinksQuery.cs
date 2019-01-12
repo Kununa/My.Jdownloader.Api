@@ -28,7 +28,7 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
         [JsonProperty(PropertyName = "packageName")]
         public string PackageName { get; set; }
         [JsonProperty(PropertyName = "priority"), JsonConverter(typeof(StringEnumConverter))]
-        public PriorityType Priority { get; set; }
+        public Enums.PriorityType Priority { get; set; }
         [JsonProperty(PropertyName = "sourceUrl")]
         public string SourceUrl { get; set; }
 

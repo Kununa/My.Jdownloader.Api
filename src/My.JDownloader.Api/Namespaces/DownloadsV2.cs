@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using My.JDownloader.Api.ApiHandler;
+﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.DownloadsV2;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace My.JDownloader.Api.Namespaces
@@ -17,6 +16,36 @@ namespace My.JDownloader.Api.Namespaces
         {
             _Device = device;
         }
+
+        public async Task<bool> Cleanup(long[] linkIds, long[] packageIds, Enums.Action action, Enums.Mode mode, Enums.SelectionType selectionType)
+        {
+            var param = new object[] { linkIds, packageIds, action, mode, selectionType };
+
+            var response =
+                await JDownloaderApiHandler.CallAction<List<DefaultReturnObject>>(_Device, "/downloadsV2/queryPackages", param,
+                    JDownloaderHandler.LoginObject);
+            return response != null;
+        }
+
+        public async Task<bool> ForceDownload(long[] linkIds, long[] packageIds)
+        {
+            var param = new object[] { linkIds, packageIds};
+
+            var response =
+                await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadsV2/queryPackages", param,
+                    JDownloaderHandler.LoginObject);
+            return response;
+        }
+
+        /*public async Task<bool> GetDownloadUrls(long[] linkIds, long[] packageIds, UrlDisplayTypeStorable[] urlDisplayTypeStorable)
+        {
+            var param = new object[] { linkIds, packageIds };
+
+            var response =
+                await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadsV2/queryPackages", param,
+                    JDownloaderHandler.LoginObject);
+            return response;
+        }*/
 
         /// <summary>
         /// Gets the stop mark as long.

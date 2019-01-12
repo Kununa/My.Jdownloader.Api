@@ -21,7 +21,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "onlineCount")]
         public int OnlineCount { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]
-        public PriorityType Priority { get; set; }
+        public Enums.PriorityType Priority { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "saveTo")]
         public string SaveTo { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "tempUnknownCount")]

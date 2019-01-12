@@ -31,7 +31,7 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         [JsonProperty(PropertyName = "packageUUID")]
         public long PackageUUID { get; set; }
         [JsonProperty(PropertyName = "priority")]
-        public PriorityType Priority { get; set; }
+        public Enums.PriorityType Priority { get; set; }
         [JsonProperty(PropertyName = "running")]
         public bool Running { get; set; }
         [JsonProperty(PropertyName = "skipped")]
