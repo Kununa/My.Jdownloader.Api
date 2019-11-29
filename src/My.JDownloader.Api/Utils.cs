@@ -1,6 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using Polly;
+using Polly.Retry;
 
 namespace My.JDownloader.Api
 {
@@ -9,6 +15,9 @@ namespace My.JDownloader.Api
         internal static string ServerDomain = "server";
         internal static string DeviceDomain = "device";
         internal static string AppKey = "my.jdownloader.api.wrapper";
+        private static readonly HttpClient HttpClient = new HttpClient();
+        static readonly AsyncPolicy AsyncRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        public static string ApiUrl = "http://api.jdownloader.org";
 
         #region "Secret and Encryption tokens"
 
@@ -46,6 +55,126 @@ namespace My.JDownloader.Api
             return ret;
         }
 
-    #endregion
+        #endregion
+
+        public static async Task<string> PostMethod(string url, string body, bool eventListener = false)
+        {
+            try
+            {
+                if (String.IsNullOrEmpty(body))
+                    return null;
+
+                StringContent content = new StringContent(body, Encoding.UTF8, "application/aesjson");
+                using (HttpResponseMessage response = eventListener ? await HttpClient.PostAsync(url, content) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.PostAsync(url, content)))
+                {
+                    if (response != null)
+                    {
+                        return await response.Content.ReadAsStringAsync();
+                    }
+                }
+
+                return null;
+            }
+            catch (TaskCanceledException e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
+
+        public static long GetUniqueRid()
+        {
+            double d = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            return (long)d;
+        }
+
+        #region "Encrypt, Decrypt and Signature"
+
+        public static string GetSignature(string data, byte[] key)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key), "The ivKey is null. Please check your login informations. If it's still null the server may has disconnected you.");
+            }
+            var dataBytes = Encoding.UTF8.GetBytes(data);
+            var hmacsha256 = new HMACSHA256(key);
+            hmacsha256.ComputeHash(dataBytes);
+            var hash = hmacsha256.Hash;
+            string binaryString = hash.Aggregate("", (current, t) => current + t.ToString("X2"));
+            return binaryString.ToLower();
+        }
+
+        public static string Encrypt(string data, byte[] ivKey)
+        {
+            if (ivKey == null)
+            {
+                throw new ArgumentNullException(nameof(ivKey), "The ivKey is null. Please check your login informations. If it's still null the server may has disconnected you.");
+            }
+            var iv = new byte[16];
+            var key = new byte[16];
+            Array.Copy(ivKey, iv, 16);
+            Array.Copy(ivKey, 16, key, 0, 16);
+
+            var rj = new RijndaelManaged
+            {
+                Key = key,
+                IV = iv,
+                Mode = CipherMode.CBC,
+                BlockSize = 128
+            };
+            ICryptoTransform encryptor = rj.CreateEncryptor();
+            var msEncrypt = new MemoryStream();
+            var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
+            using (var swEncrypt = new StreamWriter(csEncrypt))
+            {
+                swEncrypt.Write(data);
+            }
+            byte[] encrypted = msEncrypt.ToArray();
+            return Convert.ToBase64String(encrypted);
+        }
+
+        public static string Decrypt(string data, byte[] ivKey)
+        {
+            if (data == null)
+            {
+                Console.WriteLine("The data is null. This might happen due to overloading the server.");
+                return null;
+            }
+            if (ivKey == null)
+            {
+                throw new Exception(
+                    "The ivKey is null. Please check your login informations. If it's still null the server may has disconnected you.");
+            }
+            var iv = new byte[16];
+            var key = new byte[16];
+            Array.Copy(ivKey, iv, 16);
+            Array.Copy(ivKey, 16, key, 0, 16);
+
+            byte[] cypher = Convert.FromBase64String(data);
+            var rj = new RijndaelManaged
+            {
+                BlockSize = 128,
+                Mode = CipherMode.CBC,
+                IV = iv,
+                Key = key
+            };
+            var ms = new MemoryStream(cypher);
+            string result;
+            using (var cs = new CryptoStream(ms, rj.CreateDecryptor(), CryptoStreamMode.Read))
+            {
+                using (var sr = new StreamReader(cs))
+                {
+                    result = sr.ReadToEnd();
+                }
+            }
+            return result;
+        }
+
+        #endregion
     }
 }

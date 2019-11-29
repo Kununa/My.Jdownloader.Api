@@ -6,9 +6,9 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
     {
         [JsonProperty(PropertyName = "addedDate")]
         public long AddedDate { get; set; }
-        [JsonProperty(PropertyName = "vytesLoaded")]
+        [JsonProperty(PropertyName = "bytesLoaded")]
         public long BytesLoaded { get; set; }
-        [JsonProperty(PropertyName = "vytesTotal")]
+        [JsonProperty(PropertyName = "bytesTotal")]
         public long BytesTotal { get; set; }
         [JsonProperty(PropertyName = "comment")]
         public string Comment { get; set; }

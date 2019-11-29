@@ -14,7 +14,7 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         public bool BytesLoaded { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "bytesTotal")]
         public bool BytesTotal { get; set; }
-        [Newtonsoft.Json.JsonProperty(PropertyName = "comment")]
+        [Newtonsoft.Json.JsonProperty(PropertyName = "comment")] //?
         public bool Comment { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "enabled")]
         public bool Enabled { get; set; }
@@ -29,11 +29,11 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         [Newtonsoft.Json.JsonProperty(PropertyName = "host")]
         public bool Host { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "jobUUIDs")]
-        public long[] JobUUIDs { get; set; }
+        public long[] JobUUIDs { get; set; } = new long[0];
         [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
-        public int MaxResults { get; set; }
+        private uint MaxResults { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "packageUUIDs")]
-        public long[] PackageUUIDs { get; set; }
+        public long[] PackageUUIDs { get; set; } = new long[0];
         [Newtonsoft.Json.JsonProperty(PropertyName = "password")]
         public bool Password { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]
@@ -50,5 +50,10 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         public bool Status { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "url")]
         public bool Url { get; set; }
+
+        public LinkQuery(uint maxResults = 100)
+        {
+            MaxResults = maxResults;
+        }
     }
 }

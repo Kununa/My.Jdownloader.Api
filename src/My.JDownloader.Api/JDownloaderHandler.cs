@@ -9,16 +9,16 @@ namespace My.JDownloader.Api
 {
     public class JDownloaderHandler
     {
-        public bool IsConnected { get; set; } = false;
+        public bool IsConnected { get; set; }
 
         internal static LoginObject LoginObject;
 
         private byte[] _LoginSecret;
         private byte[] _DeviceSecret;
 
-        
+
         //private readonly JDownloaderApiHandler JDownloaderApiHandler = new JDownloaderApiHandler();
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -104,11 +104,12 @@ namespace My.JDownloader.Api
             if (response == null)
                 return false;
 
+            IsConnected = false;
             LoginObject = null;
             return true;
         }
         #endregion
-        
+
 
         /// <summary>
         /// Lists all Devices which are currently connected to your my.jdownloader.org account.
@@ -136,14 +137,14 @@ namespace My.JDownloader.Api
         /// </summary>
         /// <param name="device">The device you want to call the methods on.</param>
         /// <returns>An deviceHandler instance.</returns>
-        public DeviceHandler GetDeviceHandler(DeviceObject device)
+        public DeviceHandler GetDeviceHandler(DeviceObject device, bool useDirectConnect = true)
         {
             if (IsConnected)
             {
                 //TODO: Make it possible to directly connect to the jdownloader client. If it's not working use the relay server.
                 //var tmp = JDownloaderApiHandler.CallAction<DefaultReturnObject>(device, "/device/getDirectConnectionInfos",
                 //    null, LoginObject, true);
-                return new DeviceHandler(device, LoginObject);
+                return new DeviceHandler(device, LoginObject, useDirectConnect);
             }
             return null;
         }

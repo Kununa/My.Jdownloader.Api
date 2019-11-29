@@ -10,29 +10,27 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class DownloadsV2
     {
-        private readonly DeviceObject _Device;
+        private readonly DeviceObject device;
 
         internal DownloadsV2(DeviceObject device)
         {
-            _Device = device;
+            this.device = device;
         }
 
         public async Task<bool> Cleanup(long[] linkIds, long[] packageIds, Enums.Action action, Enums.Mode mode, Enums.SelectionType selectionType)
         {
-            var param = new object[] { linkIds, packageIds, action, mode, selectionType };
-
+            var param = new object[] { linkIds, packageIds, action.ToString(),  mode.ToString(), selectionType.ToString() };
             var response =
-                await JDownloaderApiHandler.CallAction<List<DefaultReturnObject>>(_Device, "/downloadsV2/queryPackages", param,
+                await JDownloaderApiHandler.CallAction<string>(device, "/downloadsV2/cleanup", param,
                     JDownloaderHandler.LoginObject);
             return response != null;
         }
 
         public async Task<bool> ForceDownload(long[] linkIds, long[] packageIds)
         {
-            var param = new object[] { linkIds, packageIds};
-
+            var param = new object[] { linkIds, packageIds };
             var response =
-                await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadsV2/queryPackages", param,
+                await JDownloaderApiHandler.CallAction<bool>(device, "/downloadsV2/queryPackages", param,
                     JDownloaderHandler.LoginObject);
             return response;
         }
@@ -53,8 +51,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The stop mark as long.</returns>
         public async Task<long> GetStopMark()
         {
-            var response = await JDownloaderApiHandler.CallAction<long>(_Device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
-
+            var response = await JDownloaderApiHandler.CallAction<long>(device, "/downloadsV2/getStopMark", null, JDownloaderHandler.LoginObject);
             return response;
         }
 
@@ -64,8 +61,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns informations about a stop marked link.</returns>
         public async Task<DownloadLink> GetStopMarkedLink()
         {
-            var response = await JDownloaderApiHandler.CallAction<DownloadLink>(_Device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
-
+            var response = await JDownloaderApiHandler.CallAction<DownloadLink>(device, "/downloadsV2/getStopMarkedLink", null, JDownloaderHandler.LoginObject);
             return response;
         }
 
@@ -76,11 +72,13 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns a list of all available packages.</returns>
         public async Task<List<FilePackage>> QueryPackages(PackageQuery requestObject)
         {
+            if (requestObject == null)
+                requestObject = new PackageQuery();
             string json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
 
             var response =
-                await JDownloaderApiHandler.CallAction<List<FilePackage>>(_Device, "/downloadsV2/queryPackages", param,
+                await JDownloaderApiHandler.CallAction<List<FilePackage>>(device, "/downloadsV2/queryPackages", param,
                     JDownloaderHandler.LoginObject);
             return response;
         }
@@ -96,7 +94,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { packageIds, afterDestPackageId };
 
             var response =
-                await JDownloaderApiHandler.CallAction<object>(_Device, "/downloadsV2/movePackages", param,
+                await JDownloaderApiHandler.CallAction<object>(device, "/downloadsV2/movePackages", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -111,10 +109,28 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> RemoveLinks(long[] linkIds, long[] packageIds)
         {
-            var param = new object[] { linkIds, packageIds };
+            var param = new object[] { linkIds ?? new long[0], packageIds ?? new long[0] };
 
             var response =
-                await JDownloaderApiHandler.CallAction<object>(_Device, "/downloadsV2/removeLinks", param,
+                await JDownloaderApiHandler.CallAction<object>(device, "/downloadsV2/removeLinks", param,
+                    JDownloaderHandler.LoginObject);
+            if (response == null)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Removes one or multiple links or packages.
+        /// </summary>
+        /// <param name="linkIds">The ids of the links you want to remove.</param>
+        /// <param name="packageIds">The ids of the packages you want to remove.</param>
+        /// <returns>True if successfull.</returns>
+        public async Task<bool> ResetLinks(long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { linkIds ?? new long[0], packageIds ?? new long[0] };
+
+            var response =
+                await JDownloaderApiHandler.CallAction<object>(device, "/downloadsV2/resetLinks", param,
                     JDownloaderHandler.LoginObject);
             if (response == null)
                 return false;
@@ -128,11 +144,13 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns a list of all links that are currently in the download list.</returns>
         public async Task<List<DownloadLink>> QueryLinks(LinkQuery queryLink)
         {
+            if (queryLink == null)
+                queryLink = new LinkQuery();
             string json = JsonConvert.SerializeObject(queryLink);
             var param = new[] { json };
 
             var response =
-                await JDownloaderApiHandler.CallAction<List<DownloadLink>>(_Device, "/downloadsV2/queryLinks", param,
+                await JDownloaderApiHandler.CallAction<List<DownloadLink>>(device, "/downloadsV2/queryLinks", param,
                     JDownloaderHandler.LoginObject).ConfigureAwait(false);
             return response;
         }

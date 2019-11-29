@@ -14,14 +14,14 @@ namespace My.JDownloader.Api
 {
     public class DeviceHandler
     {
-        private readonly DeviceObject _Device;
+        private readonly DeviceObject device;
 
-        private LoginObject _LoginObject;
+        private LoginObject loginObject;
 
-        private byte[] _LoginSecret;
-        private byte[] _DeviceSecret;
+        private byte[] loginSecret;
+        private byte[] deviceSecret;
 
-        public bool IsConnected;
+        public bool IsConnected { get; set; }
 
         public AccountsV2 AccountsV2;
         public DownloadController DownloadController;
@@ -38,28 +38,31 @@ namespace My.JDownloader.Api
 
         public event EventHandler<SubscriptionEventArgs> SubscriptionEvent;
         private Timer timer;
-        private bool isBusy;
+        private readonly SemaphoreSlim isBusy;
 
 
-        internal DeviceHandler(DeviceObject device, LoginObject LoginObject)
+        internal DeviceHandler(DeviceObject device, LoginObject loginObject, bool useDirectConnect = true)
         {
-            _Device = device;
-            _LoginObject = LoginObject;
+            this.device = device;
+            this.loginObject = loginObject;
 
-            AccountsV2 = new AccountsV2(_Device);
-            DownloadController = new DownloadController(_Device);
-            Extensions = new Extensions(_Device);
-            Extraction = new Extraction(_Device);
-            LinkCrawler = new LinkCrawler(_Device);
-            LinkgrabberV2 = new LinkGrabberV2(_Device);
-            DownloadsV2 = new DownloadsV2(_Device);
-            Update = new Update(_Device);
-            Jd = new JD(_Device);
-            System = new Namespaces.System(_Device);
-            Toolbar = new Toolbar(_Device);
-            Events = new Events(_Device);
-            DirectConnect();
-            isBusy = false;
+            AccountsV2 = new AccountsV2(this.device);
+            DownloadController = new DownloadController(this.device);
+            Extensions = new Extensions(this.device);
+            Extraction = new Extraction(this.device);
+            LinkCrawler = new LinkCrawler(this.device);
+            LinkgrabberV2 = new LinkGrabberV2(this.device);
+            DownloadsV2 = new DownloadsV2(this.device);
+            Update = new Update(this.device);
+            Jd = new JD(this.device);
+            System = new Namespaces.System(this.device);
+            Toolbar = new Toolbar(this.device);
+            Events = new Events(this.device);
+            if (useDirectConnect)
+                DirectConnect();
+            else
+                Connect("http://api.jdownloader.org").Wait();
+            isBusy = new SemaphoreSlim(1, 1);
             StartPolling();
         }
 
@@ -74,7 +77,7 @@ namespace My.JDownloader.Api
         /// </summary>
         private void DirectConnect()
         {
-            bool connected = false;
+            var connected = false;
             foreach (var conInfos in GetDirectConnectionInfos().Result)
             {
                 if (Connect(string.Concat("http://", conInfos.Ip, ":", conInfos.Port), true).Result)
@@ -86,7 +89,7 @@ namespace My.JDownloader.Api
 
             if (connected == false)
             {
-                connected = Connect("http://api.jdownloader.org").Result;
+                Connect("http://api.jdownloader.org").Wait();
             }
         }
 
@@ -94,35 +97,35 @@ namespace My.JDownloader.Api
         private async Task<bool> Connect(string apiUrl, bool fast = false)
         {
             //Calculating the Login and Device secret
-            _LoginSecret = Utils.GetSecret(_LoginObject.Email, _LoginObject.Password, Utils.ServerDomain);
-            _DeviceSecret = Utils.GetSecret(_LoginObject.Email, _LoginObject.Password, Utils.DeviceDomain);
+            loginSecret = Utils.GetSecret(loginObject.Email, loginObject.Password, Utils.ServerDomain);
+            deviceSecret = Utils.GetSecret(loginObject.Email, loginObject.Password, Utils.DeviceDomain);
 
             //Creating the query for the connection request
             string connectQueryUrl =
-                $"/my/connect?email={HttpUtility.UrlEncode(_LoginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
-            JDownloaderApiHandler._ApiUrl = apiUrl;
+                $"/my/connect?email={HttpUtility.UrlEncode(loginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
+            Utils.ApiUrl = apiUrl;
             //Calling the query
-            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, _LoginSecret, fast: fast);
+            var response = await JDownloaderApiHandler.CallServer<LoginObject>(connectQueryUrl, loginSecret, fast: fast);
 
             //If the response is null the connection was not successfull
             if (response == null)
                 return false;
 
-            response.Email = _LoginObject.Email;
-            response.Password = _LoginObject.Password;
+            response.Email = loginObject.Email;
+            response.Password = loginObject.Password;
 
             //Else we are saving the response which contains the SessionToken, RegainToken and the RequestId
-            _LoginObject = response;
-            _LoginObject.ServerEncryptionToken = Utils.UpdateEncryptionToken(_LoginSecret, _LoginObject.SessionToken);
-            _LoginObject.DeviceEncryptionToken = Utils.UpdateEncryptionToken(_DeviceSecret, _LoginObject.SessionToken);
+            loginObject = response;
+            loginObject.ServerEncryptionToken = Utils.UpdateEncryptionToken(loginSecret, loginObject.SessionToken);
+            loginObject.DeviceEncryptionToken = Utils.UpdateEncryptionToken(deviceSecret, loginObject.SessionToken);
             IsConnected = true;
             return true;
         }
 
         private async Task<List<DeviceConnectionInfoObject>> GetDirectConnectionInfos()
         {
-            var tmp = await JDownloaderApiHandler.CallAction<DeviceConnectionInfoReturnObject>(_Device, "/device/getDirectConnectionInfos",
-                null, _LoginObject);
+            var tmp = await JDownloaderApiHandler.CallAction<DeviceConnectionInfoReturnObject>(device, "/device/getDirectConnectionInfos",
+                null, loginObject);
             if (string.IsNullOrEmpty(tmp.ToString()))
                 return new List<DeviceConnectionInfoObject>();
 
@@ -139,19 +142,14 @@ namespace My.JDownloader.Api
 
         private async void TimerTick(object state)
         {
-            if (isBusy == true)
-            {
-                return;
-            }
-
+            await isBusy.WaitAsync();
             try
             {
-                isBusy = true;
                 if (Events.SubscriptionIDs.Count > 0)
                 {
                     try
                     {
-                        foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x))?.ToArray()))
+                        foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x)).ToArray()))
                             foreach (var e in t)
                             {
                                 SubscriptionEventArgs args = new SubscriptionEventArgs
@@ -163,12 +161,15 @@ namespace My.JDownloader.Api
                                 SubscriptionEvent?.Invoke(this, args);
                             }
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
             }
             finally
             {
-                isBusy = false;
+                isBusy.Release();
             }
         }
     }

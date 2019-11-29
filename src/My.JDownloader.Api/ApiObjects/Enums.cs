@@ -1,4 +1,6 @@
-﻿namespace My.JDownloader.Api.ApiObjects
+﻿using System;
+
+namespace My.JDownloader.Api.ApiObjects
 {
     public class Enums
     {
@@ -25,7 +27,7 @@
 
         public enum ArchiveFileStatus
         {
-            //  File is available for extraction
+            // File is available for extraction
             COMPLETE,
             //File exists, but is incomplete
             INCOMPLETE,
@@ -33,30 +35,66 @@
             MISSING
         }
 
-        public enum Action
+        public sealed class Action
         {
-            DELETE_ALL,
-            DELETE_DISABLED,
-            DELETE_FAILED,
-            DELETE_FINISHED,
-            DELETE_OFFLINE,
-            DELETE_DUPE,
-            DELETE_MODE
+            private readonly string value;
+
+            public static readonly Action DELETE_ALL = new Action("DELETE_ALL");
+            public static readonly Action DELETE_DISABLED = new Action("DELETE_DISABLED");
+            public static readonly Action DELETE_FAILED = new Action("DELETE_FAILED");
+            public static readonly Action DELETE_FINISHED = new Action("DELETE_FINISHED");
+            public static readonly Action DELETE_OFFLINE = new Action("DELETE_OFFLINE");
+            public static readonly Action DELETE_DUPE = new Action("DELETE_DUPE");
+            public static readonly Action DELETE_MODE = new Action("DELETE_MODE");
+
+            private Action(string value)
+            {
+                this.value = value;
+            }
+
+            public override string ToString()
+            {
+                return value;
+            }
         }
 
-        public enum Mode
+        public sealed class Mode
         {
-            REMOVE_LINKS_AND_DELETE_FILES,
-            REMOVE_LINKS_AND_RECYCLE_FILES,
-            REMOVE_LINKS_ONLY
+            private readonly string value;
+
+            public static readonly Mode REMOVE_LINKS_AND_DELETE_FILES = new Mode("REMOVE_LINKS_AND_DELETE_FILES");
+            public static readonly Mode REMOVE_LINKS_AND_RECYCLE_FILES = new Mode("REMOVE_LINKS_AND_RECYCLE_FILES");
+            public static readonly Mode REMOVE_LINKS_ONLY = new Mode("REMOVE_LINKS_ONLY");
+
+            private Mode(string value)
+            {
+                this.value = value;
+            }
+
+            public override string ToString()
+            {
+                return value;
+            }
         }
 
-        public enum SelectionType
+        public sealed class SelectionType
         {
-            SELECTED,
-            UNSELECTED,
-            ALL,
-            NONE
+
+            private readonly string value;
+            public static readonly SelectionType SELECTED = new SelectionType("SELECTED");
+            public static readonly SelectionType UNSELECTED = new SelectionType("UNSELECTED");
+            public static readonly SelectionType ALL = new SelectionType("ALL");
+            public static readonly SelectionType NONE = new SelectionType("NONE");
+
+            private SelectionType(string value)
+            {
+                this.value = value;
+            }
+
+            public override string ToString()
+            {
+                return value;
+            }
         }
     }
 }

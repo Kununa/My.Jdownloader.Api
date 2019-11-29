@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace My.JDownloader.Api.ApiObjects.DownloadsV2
+﻿namespace My.JDownloader.Api.ApiObjects.DownloadsV2
 {
     public class PackageQuery
     {
@@ -25,7 +19,7 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         [Newtonsoft.Json.JsonProperty(PropertyName = "hosts")]
         public bool Hosts { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
-        public int MaxResults { get; set; }
+        private uint MaxResults { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "packageUUIDs")]
         public long[] PackageUUIDs { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]
@@ -40,5 +34,10 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         public int StartAt { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "status")]
         public bool Status { get; set; }
+
+        public PackageQuery(uint maxResults = 100)
+        {
+            MaxResults = maxResults;
+        }
     }
 }
