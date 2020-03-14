@@ -4,12 +4,8 @@ using My.JDownloader.Api.ApiObjects.Login;
 using Newtonsoft.Json;
 using Polly;
 using System;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -30,16 +26,16 @@ namespace My.JDownloader.Api.ApiHandler
 
         public static async Task<T> CallServer<T>(string query, byte[] key, bool fast = false)
         {
-            string rid = Utils.GetUniqueRid().ToString();
+            var rid = Utils.GetUniqueRid().ToString();
             query += "&rid=" + rid;
-            string signature = Utils.GetSignature(query, key);
+            var signature = Utils.GetSignature(query, key);
             query += "&signature=" + signature;
 
-            string url = Utils.ApiUrl + query;
-            string response = "";
+            var url = Utils.ApiUrl + query;
+            var response = "";
             try
             {
-                using (HttpResponseMessage httpResponse = fast ? await FastHttpClient.GetAsync(url) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.GetAsync(url)))
+                using (var httpResponse = fast ? await FastHttpClient.GetAsync(url) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.GetAsync(url)))
                 {
                     if (httpResponse.StatusCode == HttpStatusCode.OK)
                         response = await httpResponse.Content.ReadAsStringAsync();
@@ -69,7 +65,7 @@ namespace My.JDownloader.Api.ApiHandler
                 throw new ArgumentException("The id of the device is empty. Please call again the GetDevices Method and try again.", nameof(device));
 
             var query = $"/t_{HttpUtility.UrlEncode(loginObject.SessionToken)}_{HttpUtility.UrlEncode(device.Id)}{action}";
-            CallActionObject callActionObject = new CallActionObject
+            var callActionObject = new CallActionObject
             {
                 ApiVer = 1,
                 Params = param,

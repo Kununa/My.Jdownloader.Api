@@ -35,7 +35,7 @@ namespace My.JDownloader.Api
 
         internal static byte[] UpdateEncryptionToken(byte[] oldToken, string UpdatedToken)
         {
-            byte[] newToken = GetByteArrayByHexString(UpdatedToken);
+            var newToken = GetByteArrayByHexString(UpdatedToken);
             var newHash = new byte[oldToken.Length + newToken.Length];
             oldToken.CopyTo(newHash, 0);
             newToken.CopyTo(newHash, 32);
@@ -47,8 +47,8 @@ namespace My.JDownloader.Api
         internal static byte[] GetByteArrayByHexString(string hexString)
         {
             hexString = hexString.Replace("-", "");
-            byte[] ret = new byte[hexString.Length / 2];
-            for (int i = 0; i < ret.Length; i++)
+            var ret = new byte[hexString.Length / 2];
+            for (var i = 0; i < ret.Length; i++)
             {
                 ret[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             }
@@ -64,8 +64,8 @@ namespace My.JDownloader.Api
                 if (String.IsNullOrEmpty(body))
                     return null;
 
-                StringContent content = new StringContent(body, Encoding.UTF8, "application/aesjson");
-                using (HttpResponseMessage response = eventListener ? await HttpClient.PostAsync(url, content) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.PostAsync(url, content)))
+                var content = new StringContent(body, Encoding.UTF8, "application/aesjson");
+                using (var response = eventListener ? await HttpClient.PostAsync(url, content) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.PostAsync(url, content)))
                 {
                     if (response != null)
                     {
@@ -89,7 +89,7 @@ namespace My.JDownloader.Api
 
         public static long GetUniqueRid()
         {
-            double d = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            var d = (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
             return (long)d;
         }
 
@@ -105,7 +105,7 @@ namespace My.JDownloader.Api
             var hmacsha256 = new HMACSHA256(key);
             hmacsha256.ComputeHash(dataBytes);
             var hash = hmacsha256.Hash;
-            string binaryString = hash.Aggregate("", (current, t) => current + t.ToString("X2"));
+            var binaryString = hash.Aggregate("", (current, t) => current + t.ToString("X2"));
             return binaryString.ToLower();
         }
 
@@ -127,14 +127,14 @@ namespace My.JDownloader.Api
                 Mode = CipherMode.CBC,
                 BlockSize = 128
             };
-            ICryptoTransform encryptor = rj.CreateEncryptor();
+            var encryptor = rj.CreateEncryptor();
             var msEncrypt = new MemoryStream();
             var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write);
             using (var swEncrypt = new StreamWriter(csEncrypt))
             {
                 swEncrypt.Write(data);
             }
-            byte[] encrypted = msEncrypt.ToArray();
+            var encrypted = msEncrypt.ToArray();
             return Convert.ToBase64String(encrypted);
         }
 
@@ -155,7 +155,7 @@ namespace My.JDownloader.Api
             Array.Copy(ivKey, iv, 16);
             Array.Copy(ivKey, 16, key, 0, 16);
 
-            byte[] cypher = Convert.FromBase64String(data);
+            var cypher = Convert.FromBase64String(data);
             var rj = new RijndaelManaged
             {
                 BlockSize = 128,

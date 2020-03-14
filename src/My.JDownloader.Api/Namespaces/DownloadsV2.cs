@@ -74,7 +74,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             if (requestObject == null)
                 requestObject = new PackageQuery();
-            string json = JsonConvert.SerializeObject(requestObject);
+            var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
 
             var response =
@@ -146,7 +146,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             if (queryLink == null)
                 queryLink = new LinkQuery();
-            string json = JsonConvert.SerializeObject(queryLink);
+            var json = JsonConvert.SerializeObject(queryLink);
             var param = new[] { json };
 
             var response =

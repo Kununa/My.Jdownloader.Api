@@ -18,7 +18,7 @@ namespace My.JDownloader.Api.ApiHandler
                 throw new ArgumentException("The id of the device is empty. Please call again the GetDevices Method and try again.", nameof(device));
 
             var query = $"/t_{HttpUtility.UrlEncode(loginObject.SessionToken)}_{HttpUtility.UrlEncode(device.Id)}{action}";
-            CallActionObject callActionObject = new CallActionObject
+            var callActionObject = new CallActionObject
             {
                 ApiVer = 1,
                 Params = param,

@@ -101,7 +101,7 @@ namespace My.JDownloader.Api
             deviceSecret = Utils.GetSecret(loginObject.Email, loginObject.Password, Utils.DeviceDomain);
 
             //Creating the query for the connection request
-            string connectQueryUrl =
+            var connectQueryUrl =
                 $"/my/connect?email={HttpUtility.UrlEncode(loginObject.Email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
             Utils.ApiUrl = apiUrl;
             //Calling the query
@@ -152,7 +152,7 @@ namespace My.JDownloader.Api
                         foreach (var t in await Task.WhenAll(Events.SubscriptionIDs.Select(x => Events.Listen(x)).ToArray()))
                             foreach (var e in t)
                             {
-                                SubscriptionEventArgs args = new SubscriptionEventArgs
+                                var args = new SubscriptionEventArgs
                                 {
                                     EventId = e.EventId,
                                     EventData = e.EventData,
