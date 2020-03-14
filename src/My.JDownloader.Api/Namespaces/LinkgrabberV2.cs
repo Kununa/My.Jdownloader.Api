@@ -51,13 +51,13 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="content">File as dataurl. https://de.wikipedia.org/wiki/Data-URL </param>
         public bool AddContainer(ContainerType type, string content)
         {
-            AddContainerObject containerObject = new AddContainerObject
+            var containerObject = new AddContainerObject
             {
                 Type = type.ToString(),
                 Content = content
             };
 
-            string json = JsonConvert.SerializeObject(containerObject);
+            var json = JsonConvert.SerializeObject(containerObject);
             var param = new[] { json };
             var response = JDownloaderApiHandler.CallAction<object>(_Device, "/linkgrabberv2/addContainer",
                 param, JDownloaderHandler.LoginObject);
@@ -65,15 +65,28 @@ namespace My.JDownloader.Api.Namespaces
         }
 
         /// <summary>
-        /// Adds a download link to the given device.
+        /// Adds the download links
         /// </summary>
-        /// <param name="requestObject">Contains informations like the link itself or the priority. If you want to use multiple links sperate them with an ';' char.</param>
+        /// <param name="links">Links to add to the Linkgrabber</param>
+        /// <returns>id of package</returns>
+        public long AddLinks(string[] links)
+        {
+            return AddLinks(new AddLinksQuery()
+            {
+                Links = string.Join(";", links)
+            });
+        }
+
+        /// <summary>
+        /// Adds download links using a request object for more configuration
+        /// </summary>
+        /// <param name="requestObject">Contains informations like the links itself or the priority.</param>
         /// <returns>id of package</returns>
         public long AddLinks(AddLinksQuery requestObject)
         {
-           // if (requestObject.Links != null)
-           //     requestObject.Links = requestObject.Links.Replace(";", "\\r\\n");
-            string json = JsonConvert.SerializeObject(requestObject, Formatting.Indented, new JsonSerializerSettings
+            // if (requestObject.Links != null)
+            //     requestObject.Links = requestObject.Links.Replace(";", "\\r\\n");
+            var json = JsonConvert.SerializeObject(requestObject, Formatting.Indented, new JsonSerializerSettings
             {
                 DefaultValueHandling = DefaultValueHandling.Include
             });
@@ -301,7 +314,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns a list of all links that are currently in the linkcollector list.</returns>
         public async Task<List<QueryLinksResponseObject>> QueryLinks(CrawledLinkQuery query)
         {
-            string json = JsonConvert.SerializeObject(query);
+            var json = JsonConvert.SerializeObject(query);
             var param = new[] { json };
 
             var response =
@@ -317,7 +330,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns a list of all available packages.</returns>
         public async Task<List<CrawledPackage>> QueryPackages(CrawledPackageQuery requestObject)
         {
-            string json = JsonConvert.SerializeObject(requestObject);
+            var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
 
             var response =

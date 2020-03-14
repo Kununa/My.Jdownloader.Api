@@ -65,7 +65,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>A list of all extensions that are available.</returns>
         public async Task<ExtensionResponseObject[]> List(ExtensionRequestObject requestObject)
         {
-            string json = JsonConvert.SerializeObject(requestObject);
+            var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
             var response = await JDownloaderApiHandler.CallAction<ExtensionResponseObject[]>(_Device, "/extensions/list",
                 param, JDownloaderHandler.LoginObject);

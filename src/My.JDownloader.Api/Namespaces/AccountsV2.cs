@@ -99,7 +99,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>A list of all accounts stored on the device.</returns>
         public async Task<ListAccountResponseObject[]> ListAccounts(ListAccountRequestObject requestObject)
         {
-            string json = JsonConvert.SerializeObject(requestObject);
+            var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] {json};
             var response = await JDownloaderApiHandler.CallAction<ListAccountResponseObject[]>(_Device, "/accountsV2/listAccounts", param,
                 JDownloaderHandler.LoginObject);

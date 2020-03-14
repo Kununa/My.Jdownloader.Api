@@ -54,7 +54,7 @@ namespace My.JDownloader.Api
             _DeviceSecret = Utils.GetSecret(email, password, Utils.DeviceDomain);
 
             //Creating the query for the connection request
-            string connectQueryUrl =
+            var connectQueryUrl =
                 $"/my/connect?email={HttpUtility.UrlEncode(email)}&appkey={HttpUtility.UrlEncode(Utils.AppKey)}";
 
             //Calling the query
@@ -80,7 +80,7 @@ namespace My.JDownloader.Api
         /// <returns>True if successfull else false</returns>
         public async Task<bool> Reconnect()
         {
-            string query =
+            var query =
                 $"/my/reconnect?appkey{HttpUtility.UrlEncode(Utils.AppKey)}&sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}&regaintoken={HttpUtility.UrlEncode(LoginObject.RegainToken)}";
             var response = await JDownloaderApiHandler.CallServer<LoginObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
@@ -99,7 +99,7 @@ namespace My.JDownloader.Api
         /// <returns>True if successfull else false</returns>
         public bool Disconnect()
         {
-            string query = $"/my/disconnect?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
+            var query = $"/my/disconnect?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
             var response = JDownloaderApiHandler.CallServer<object>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return false;
@@ -117,13 +117,13 @@ namespace My.JDownloader.Api
         /// <returns>Returns a list of your currently connected devices.</returns>
         public async Task<List<DeviceObject>> GetDevices()
         {
-            List<DeviceObject> devices = new List<DeviceObject>();
-            string query = $"/my/listdevices?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
+            var devices = new List<DeviceObject>();
+            var query = $"/my/listdevices?sessiontoken={HttpUtility.UrlEncode(LoginObject.SessionToken)}";
             var response = await JDownloaderApiHandler.CallServer<DeviceJsonReturnObject>(query, LoginObject.ServerEncryptionToken);
             if (response == null)
                 return devices;
 
-            foreach (DeviceObject device in response.Devices)
+            foreach (var device in response.Devices)
             {
                 devices.Add(device);
             }
