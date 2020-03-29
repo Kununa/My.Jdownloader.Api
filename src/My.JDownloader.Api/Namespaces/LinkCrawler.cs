@@ -1,18 +1,13 @@
 ﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class LinkCrawler
+    public class LinkCrawler : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal LinkCrawler(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public LinkCrawler(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Asks the client if the linkcrawler is still crawling.
@@ -21,7 +16,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsCrawling()
         {
             var response =
-                await JDownloaderApiHandler.CallAction<bool>(_Device, "/linkcrawler/isCrawling", null, JDownloaderHandler.LoginObject);
+                await CallAction<bool>("/linkcrawler/isCrawling", null);
             return response;
         }
     }

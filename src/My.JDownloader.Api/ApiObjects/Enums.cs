@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace My.JDownloader.Api.ApiObjects
+﻿namespace My.JDownloader.Api.ApiObjects
 {
     public class Enums
     {

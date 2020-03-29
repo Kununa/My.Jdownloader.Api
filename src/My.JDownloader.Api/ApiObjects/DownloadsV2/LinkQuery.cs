@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace My.JDownloader.Api.ApiObjects.DownloadsV2
+﻿namespace My.JDownloader.Api.ApiObjects.DownloadsV2
 {
     public class LinkQuery
     {
@@ -29,11 +23,11 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         [Newtonsoft.Json.JsonProperty(PropertyName = "host")]
         public bool Host { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "jobUUIDs")]
-        public long[] JobUUIDs { get; set; } = new long[0];
+        public long[] JobUuiDs { get; set; } = new long[0];
         [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
         private uint MaxResults { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "packageUUIDs")]
-        public long[] PackageUUIDs { get; set; } = new long[0];
+        public long[] PackageUuiDs { get; set; } = new long[0];
         [Newtonsoft.Json.JsonProperty(PropertyName = "password")]
         public bool Password { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]

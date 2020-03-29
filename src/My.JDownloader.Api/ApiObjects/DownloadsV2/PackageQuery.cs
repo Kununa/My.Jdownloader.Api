@@ -21,7 +21,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
         private uint MaxResults { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "packageUUIDs")]
-        public long[] PackageUUIDs { get; set; }
+        public long[] PackageUuiDs { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]
         public bool Priority { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "running")]

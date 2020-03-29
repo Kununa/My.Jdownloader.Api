@@ -15,14 +15,9 @@ namespace My.JDownloader.Api.ApiHandler
 {
     internal class JDownloaderApiHandler
     {
-        private static readonly HttpClient FastHttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(3) };
-        static readonly AsyncPolicy AsyncRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-        private static readonly HttpClient HttpClient = new HttpClient();
-
-        public void SetApiUrl(string newApiUrl)
-        {
-            Utils.ApiUrl = newApiUrl;
-        }
+        private static readonly HttpClient fastHttpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(3) };
+        private static readonly AsyncPolicy asyncRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        private static readonly HttpClient httpClient = new HttpClient();
 
         public static async Task<T> CallServer<T>(string query, byte[] key, bool fast = false)
         {
@@ -35,14 +30,15 @@ namespace My.JDownloader.Api.ApiHandler
             var response = "";
             try
             {
-                using (var httpResponse = fast ? await FastHttpClient.GetAsync(url) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.GetAsync(url)))
+                using (var httpResponse = fast ? await fastHttpClient.GetAsync(url) : await asyncRetryPolicy.ExecuteAsync(() => httpClient.GetAsync(url)))
                 {
                     if (httpResponse.StatusCode == HttpStatusCode.OK)
                         response = await httpResponse.Content.ReadAsStringAsync();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return default;
             }
             if (key != null)
@@ -54,10 +50,10 @@ namespace My.JDownloader.Api.ApiHandler
             dynamic jsonResponse = JsonConvert.DeserializeObject(response);
             if (rid != jsonResponse?.rid.ToString() ?? "")
                 throw new Exceptions.InvalidRequestIdException("The 'RequestId' differs from the 'Requestid' from the query.");
-            return (T)JsonConvert.DeserializeObject(response, typeof(T));
+            return JsonConvert.DeserializeObject<T>(response);
         }
 
-        public static async Task<T> CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject, bool eventListener = false)
+        private static async Task<T> CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject, bool eventListener = false)
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device), "The device can't be null.");
@@ -88,11 +84,11 @@ namespace My.JDownloader.Api.ApiHandler
             //special case as event responses are completly differerent
             if (decryptedResponse.Contains("subscriptionid"))
             {
-                var direct = (T)JsonConvert.DeserializeObject(decryptedResponse, typeof(T));
+                var direct = JsonConvert.DeserializeObject<T>(decryptedResponse);
                 if (direct != null)
                     return direct;
             }
-            var res = (ApiObjects.DefaultReturnObject)JsonConvert.DeserializeObject(decryptedResponse, typeof(ApiObjects.DefaultReturnObject));
+            var res = JsonConvert.DeserializeObject<ApiObjects.DefaultReturnObject>(decryptedResponse);
             if (res == null || res.Data == null)
                 return default;
             if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JObject))

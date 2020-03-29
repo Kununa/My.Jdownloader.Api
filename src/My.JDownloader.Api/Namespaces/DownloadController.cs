@@ -2,17 +2,13 @@
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class DownloadController
+    public class DownloadController : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal DownloadController(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public DownloadController(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Forces JDownloader to start downloading the given links/packages
@@ -20,10 +16,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="linkIds">The ids of the links you want to force download.</param>
         /// <param name="packageIds">The ids of the packages you want to force download.</param>
         /// <returns>True if successfull</returns>
-        public bool ForceDownload(long[] linkIds, long[] packageIds)
+        public async Task<bool> ForceDownload(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var result = JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/downloadcontroller/forceDownload", param, JDownloaderHandler.LoginObject);
+            var result = await CallAction<DefaultReturnObject>("/downloadcontroller/forceDownload", param);
             return result != null;
         }
 
@@ -33,7 +29,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current state of the device.</returns>
         public async Task<string> GetCurrentState()
         {
-            var result = await JDownloaderApiHandler.CallAction<string>(_Device, "/downloadcontroller/getCurrentState", null, JDownloaderHandler.LoginObject);
+            var result = await CallAction<string>("/downloadcontroller/getCurrentState", null);
             if (result != null)
                 return result;
             return "UNKOWN_STATE";
@@ -45,7 +41,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The actual download speed.</returns>
         public async Task<long> GetSpeedInBps()
         {
-            var result = await JDownloaderApiHandler.CallAction<long>(_Device, "/downloadcontroller/getSpeedInBps", null, JDownloaderHandler.LoginObject);
+            var result = await CallAction<long>("/downloadcontroller/getSpeedInBps", null);
             return result;
         }
 
@@ -55,7 +51,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Start()
         {
-            var result = await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadcontroller/start", null, JDownloaderHandler.LoginObject);
+            var result = await CallAction<bool>("/downloadcontroller/start", null);
             return result;
         }
 
@@ -65,7 +61,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Stop()
         {
-            var result = await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadcontroller/stop", null, JDownloaderHandler.LoginObject);
+            var result = await CallAction<bool>("/downloadcontroller/stop", null);
             return result;
         }
 
@@ -77,7 +73,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> Pause(bool pause)
         {
             var param = new[] { pause };
-            var result = await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadcontroller/pause", param, JDownloaderHandler.LoginObject);
+            var result = await CallAction<bool>("/downloadcontroller/pause", param);
 
             return result;
         }

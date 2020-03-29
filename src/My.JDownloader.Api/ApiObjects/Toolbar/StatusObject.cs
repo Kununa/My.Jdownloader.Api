@@ -9,7 +9,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "premium")]
         public bool Premium { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "download_complete")]
-        public long Download_complete { get; set; }
+        public long DownloadComplete { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "stopafter")]
         public bool Stopafter { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "limit")]
@@ -19,7 +19,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "state")]
         public string State { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "download_current")]
-        public long Download_current { get; set; }
+        public long DownloadCurrent { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "clipboard")]
         public bool Clipboard { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "speed")]

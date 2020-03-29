@@ -1,27 +1,22 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
+﻿using System.Collections.Generic;
+using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.System;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class System
+    public class System : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal System(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public System(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Closes the JDownloader client.
         /// </summary>
         public async Task ExitJd()
         {
-            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/exitJD", null, JDownloaderHandler.LoginObject);
+            await CallAction<object>("/system/exitJD", null);
         }
 
         /// <summary>
@@ -29,10 +24,10 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="path">The Path you want to check.</param>
         /// <returns>An array with storage informations.</returns>
-        public async Task<StorageInfoReturnObject[]> GetStorageInfos(string path)
+        public async Task<IReadOnlyList<StorageInfoReturnObject>> GetStorageInfos(string path)
         {
             var param = new[] { path };
-            var tmp = await JDownloaderApiHandler.CallAction<StorageInfoReturnObject[]>(_Device, "/system/getStorageInfos", param, JDownloaderHandler.LoginObject);
+            var tmp = await CallAction<IReadOnlyList<StorageInfoReturnObject >> ("/system/getStorageInfos", param);
 
             return tmp;
         }
@@ -43,15 +38,15 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<SystemInfoReturnObject> GetSystemInfos()
         {
-            return await JDownloaderApiHandler.CallAction<SystemInfoReturnObject>(_Device, "/system/getSystemInfos", null, JDownloaderHandler.LoginObject);
+            return await CallAction<SystemInfoReturnObject>("/system/getSystemInfos", null);
         }
 
         /// <summary>
         /// Hibernates the current os the JDownloader client is running on.
         /// </summary>
-        public async Task HibernateOS()
+        public async Task HibernateOs()
         {
-            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/hibernateOS", null, JDownloaderHandler.LoginObject);
+            await CallAction<object>("/system/hibernateOS", null);
         }
 
         /// <summary>
@@ -59,24 +54,24 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartJd()
         {
-            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/restartJD", null, JDownloaderHandler.LoginObject);
+            await CallAction<object>("/system/restartJD", null);
         }
 
         /// <summary>
         /// Shutsdown the current os the JDownloader client is running on.
         /// </summary>
         /// <param name="force">True if you want to force the shutdown process.</param>
-        public async Task ShutdownOS(bool force)
+        public async Task ShutdownOs(bool force)
         {
-            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/shutdownOS", new[] { force }, JDownloaderHandler.LoginObject);
+            await CallAction<object>("/system/shutdownOS", new[] { force });
         }
 
         /// <summary>
         /// Sets the current os the JDownloader client is running on in standby.
         /// </summary>
-        public async Task StandbyOS()
+        public async Task StandbyOs()
         {
-            await JDownloaderApiHandler.CallAction<object>(_Device, "/system/standbyOS", null, JDownloaderHandler.LoginObject);
+            await CallAction<object>("/system/standbyOS", null);
         }
     }
 }

@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using My.JDownloader.Api.ApiHandler;
+﻿using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Toolbar;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class Toolbar
+    public class Toolbar : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal Toolbar(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public Toolbar(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Toggles the automatic reconnect function.
@@ -25,7 +18,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleAutomaticReconnect()
         {
-            var tmp = await JDownloaderApiHandler.CallAction<bool>(_Device, "/toolbar/toggleAutomaticReconnect", null, JDownloaderHandler.LoginObject);
+            var tmp = await CallAction<bool>("/toolbar/toggleAutomaticReconnect", null);
 
             return tmp;
         }
@@ -36,7 +29,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleDownloadSpeedLimit()
         {
-            var tmp = await JDownloaderApiHandler.CallAction<bool>(_Device, "/toolbar/toggleDownloadSpeedLimit", null, JDownloaderHandler.LoginObject);
+            var tmp = await CallAction<bool>("/toolbar/toggleDownloadSpeedLimit", null);
 
             return tmp;
         }
@@ -47,7 +40,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<StatusObject> GetStatus()
         {
-            var tmp = await JDownloaderApiHandler.CallAction<DefaultReturnObject>(_Device, "/toolbar/getStatus", null, JDownloaderHandler.LoginObject);
+            var tmp = await CallAction<DefaultReturnObject>("/toolbar/getStatus", null);
 
             var data = (JObject)tmp?.Data;
             return data?.ToObject<StatusObject>();

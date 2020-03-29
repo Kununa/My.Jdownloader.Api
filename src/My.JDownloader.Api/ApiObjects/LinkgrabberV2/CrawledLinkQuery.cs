@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
+﻿namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
 {
     public class CrawledLinkQuery
     {
@@ -19,11 +13,11 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
         [Newtonsoft.Json.JsonProperty(PropertyName = "host")]
         public bool Host { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "jobUUIDs")]
-        public long[] JobUUIDs { get; set; }
+        public long[] JobUuiDs { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
         public int MaxResults { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "packageUUIDs")]
-        public long[] PackageUUIDs { get; set; }
+        public long[] PackageUuiDs { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "password")]
         public bool Password { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "priority")]
@@ -35,7 +29,7 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
         [Newtonsoft.Json.JsonProperty(PropertyName = "url")]
         public bool Url { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "variantID")]
-        public bool VariantID { get; set; }
+        public bool VariantId { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "variantIcon")]
         public bool VariantIcon { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "variantName")]

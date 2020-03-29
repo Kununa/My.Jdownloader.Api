@@ -3,17 +3,13 @@ using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Extraction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class Extraction
+    public class Extraction : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal Extraction(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public Extraction(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Adds an archive password to the client.
@@ -23,8 +19,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> AddArchivePassword(string password)
         {
             var param = new[] { password };
-            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extraction/addArchivePassword",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<bool>("/extraction/addArchivePassword", param);
 
             return response;
         }
@@ -37,8 +32,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> CancelExtraction(string controllerId)
         {
             var param = new[] { controllerId };
-            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<bool>("/extraction/cancelExtraction", param);
 
             return response;
         }
@@ -46,43 +40,37 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<ArchiveStatus> GetArchiveInfo(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var response = await JDownloaderApiHandler.CallAction<ArchiveStatus>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<ArchiveStatus>("/extraction/cancelExtraction", param);
 
             return response;
         }
 
-        public async Task<List<ArchiveSettings>> GetArchiveSettings(string[] archiveIds)
+        public async Task<IReadOnlyList<ArchiveSettings>> GetArchiveSettings(string[] archiveIds)
         {
             var param = new[] { archiveIds };
-            var response = await JDownloaderApiHandler.CallAction<List<ArchiveSettings>>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<IReadOnlyList<ArchiveSettings>>("/extraction/cancelExtraction", param);
 
             return response;
         }
 
-        public async Task<List<ArchiveStatus>> GetQueue()
+        public async Task<IReadOnlyList<ArchiveStatus>> GetQueue()
         {
-            var response = await JDownloaderApiHandler.CallAction<List<ArchiveStatus>>(_Device, "/extraction/cancelExtraction",
-                null, JDownloaderHandler.LoginObject);
-
+            var response = await CallAction<IReadOnlyList<ArchiveStatus>>("/extraction/cancelExtraction", null);
             return response;
         }
 
         public async Task<bool> SetArchiveSettings(string archiveId, ArchiveSettings archiveSettings)
         {
             var param = new object[] { archiveId, archiveSettings };
-            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<bool>("/extraction/cancelExtraction", param);
 
             return response;
         }
 
-        public async Task<Dictionary<string, bool>> StartExtractionNow(long[] linkIds, long[] packageIds)
+        public async Task<IReadOnlyDictionary<string, bool>> StartExtractionNow(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var response = await JDownloaderApiHandler.CallAction<Dictionary<string, bool>>(_Device, "/extraction/cancelExtraction",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<IReadOnlyDictionary<string, bool>>("/extraction/cancelExtraction", param);
 
             return response;
         }

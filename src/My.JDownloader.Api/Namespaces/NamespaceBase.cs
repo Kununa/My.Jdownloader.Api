@@ -6,11 +6,25 @@ using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
 using Newtonsoft.Json;
 
-namespace My.JDownloader.Api.ApiHandler
+namespace My.JDownloader.Api.Namespaces
 {
-    class JDownloaderEventApiHandler
+    public class NamespaceBase
     {
-        public static async Task<T> CallAction<T>(DeviceObject device, string action, object param, LoginObject loginObject, bool eventListener = false)
+        private readonly DeviceObject device;
+        private readonly LoginObject loginObject;
+
+        internal NamespaceBase(DeviceObject device, LoginObject loginObject)
+        {
+            this.device = device;
+            this.loginObject = loginObject;
+        }
+
+        protected async Task<T> CallAction<T>( string action, object param, bool eventListener = false)
+        {
+            return await Utils.CallAction<T>(device, loginObject, action, param, eventListener);
+        }
+
+        protected async Task<T> CallEventAction<T>(string action, object param, bool eventListener = false)
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device), "The device can't be null.");

@@ -3,18 +3,17 @@ using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Events;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class Events
+    public class Events : NamespaceBase
     {
-        private readonly DeviceObject device;
 
         public List<long> SubscriptionIDs;
 
-        internal Events(DeviceObject device)
+        public Events(DeviceObject device, LoginObject loginObject) : base(device, loginObject)
         {
-            this.device = device;
             SubscriptionIDs = new List<long>();
         }
 
@@ -28,35 +27,33 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<SubscriptionResponse> AddSubscription(long subscriptionid, string[] subscriptions, string[] exclusions)
         {
             var param = new object[] { subscriptionid, subscriptions, exclusions };
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionResponse>(device, "/events/addsubscription",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<SubscriptionResponse>("/events/addsubscription", param);
             return response;
         }
 
         public async Task<SubscriptionResponse> Subscribe(string[] subscriptions = null, string[] exclusions = null)
         {
-            var param = new object[] { new[] { "STOPPED" }, exclusions};
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionResponse>(device, "/events/subscribe",
-                param, JDownloaderHandler.LoginObject);
+            if (exclusions == null)
+                exclusions = new string[0];
+            var param = new object[] { new[] { "STOPPED" }, exclusions };
+            var response = await CallAction<SubscriptionResponse>("/events/subscribe", param);
             if (!SubscriptionIDs.Contains(response.SubscriptionId))
                 SubscriptionIDs.Add(response.SubscriptionId);
 
             return response;
         }
 
-        public async Task<SubscriptionEventObject[]> Listen(long subscriptionid)
+        public async Task<IReadOnlyList<SubscriptionEventObject>> Listen(long subscriptionid)
         {
             var param = new object[] { subscriptionid };
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionEventObject[]>(device, "/events/listen",
-                param, JDownloaderHandler.LoginObject, true);
+            var response = await CallAction<IReadOnlyList<SubscriptionEventObject>>("/events/listen", param, true);
             return response ?? new SubscriptionEventObject[0];
         }
 
         public async Task<SubscriptionResponse> ChangeSubscriptionTimeouts(long subscriptionid, long polltimeout, long maxkeepalive)
         {
             var param = new object[] { subscriptionid, polltimeout, maxkeepalive };
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionResponse>(device, "/events/changesubscriptiontimeouts",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<SubscriptionResponse>("/events/changesubscriptiontimeouts", param);
 
             return response;
         }
@@ -64,8 +61,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<SubscriptionResponse> GetSubscriptionStatus(long subscriptionid)
         {
             var param = new object[] { subscriptionid };
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionResponse>(device, "/events/getsubscriptionstatus",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<SubscriptionResponse>("/events/getsubscriptionstatus", param);
 
             return response;
         }
@@ -73,16 +69,14 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<SubscriptionResponse> Unsubscribe(long subscriptionid)
         {
             var param = new object[] { subscriptionid };
-            var response = await JDownloaderApiHandler.CallAction<SubscriptionResponse>(device, "/events/unsubscribe",
-                param, JDownloaderHandler.LoginObject);
+            var response = await CallAction<SubscriptionResponse>("/events/unsubscribe", param);
 
             return response;
         }
 
-        public async Task<PublisherResponse[]> ListPublisher()
+        public async Task<IReadOnlyList<PublisherResponse>> ListPublisher()
         {
-            var response = await JDownloaderEventApiHandler.CallAction<PublisherResponse[]>(device, "/events/listpublisher",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallEventAction<IReadOnlyList<PublisherResponse>>("/events/listpublisher", null);
 
             return response;
         }

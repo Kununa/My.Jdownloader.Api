@@ -8,8 +8,8 @@ namespace My.JDownloader.Api.ApiObjects.AccountV2
         public bool Enabled { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "error")]
         public bool Error { get; set; }
-        //[Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
-        public int MaxResults { get; set; }
+        [Newtonsoft.Json.JsonProperty(PropertyName = "maxResults")]
+        public int MaxResults { get; set; } = 20;
         [Newtonsoft.Json.JsonProperty(PropertyName = "startAt")]
         public int StartAt { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "trafficLeft")]
@@ -18,6 +18,8 @@ namespace My.JDownloader.Api.ApiObjects.AccountV2
         public bool TrafficMax { get; set; }
 		[Newtonsoft.Json.JsonProperty(PropertyName = "userName")]
         public bool Username { get; set; }
+        [Newtonsoft.Json.JsonProperty(PropertyName = "uuidlist")]
+        public List<long> Uuidlist { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "valid")]
         public bool Valid { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "validUntil")]

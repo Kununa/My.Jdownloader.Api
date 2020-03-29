@@ -1,6 +1,6 @@
 ﻿namespace My.JDownloader.Api.ApiObjects.Login
 {
-    internal class LoginObject
+    public class LoginObject
     {
 
         [Newtonsoft.Json.JsonProperty(PropertyName = "sessiontoken")]

@@ -29,7 +29,7 @@ namespace My.JDownloader.Api.ApiObjects.DownloadsV2
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
         [JsonProperty(PropertyName = "packageUUID")]
-        public long PackageUUID { get; set; }
+        public long PackageUuid { get; set; }
         [JsonProperty(PropertyName = "priority")]
         public Enums.PriorityType Priority { get; set; }
         [JsonProperty(PropertyName = "running")]

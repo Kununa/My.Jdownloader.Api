@@ -14,54 +14,70 @@ namespace My.JDownloader.Api
 {
     public class DeviceHandler
     {
-        private readonly DeviceObject device;
-
-        private LoginObject loginObject;
+        private const string JdApiUrl = "http://api.jdownloader.org";
 
         private byte[] loginSecret;
         private byte[] deviceSecret;
 
-        public bool IsConnected { get; set; }
+        private readonly DeviceObject device;
+        private LoginObject loginObject;
 
-        public AccountsV2 AccountsV2;
-        public DownloadController DownloadController;
-        public Extensions Extensions;
-        public Extraction Extraction;
-        public LinkCrawler LinkCrawler;
-        public LinkGrabberV2 LinkgrabberV2;
-        public DownloadsV2 DownloadsV2;
-        public Update Update;
-        public JD Jd;
-        public Toolbar Toolbar;
-        public Events Events;
-        public Namespaces.System System;
+        private bool isConnected;
+        public bool IsConnected
+        {
+            get => isConnected;
+            private set
+            {
+                if (value)
+                {
+                    //Set device and loginObject when connection succesful
+                    AccountsV2 = new AccountsV2(device, loginObject);
+                    DownloadController = new DownloadController(device, loginObject);
+                    Extensions = new Extensions(device, loginObject);
+                    Extraction = new Extraction(device, loginObject);
+                    LinkCrawler = new LinkCrawler(device, loginObject);
+                    LinkgrabberV2 = new LinkGrabberV2(device, loginObject);
+                    DownloadsV2 = new DownloadsV2(device, loginObject);
+                    Update = new Update(device, loginObject);
+                    Jd = new Jd(device, loginObject);
+                    System = new Namespaces.System(device, loginObject);
+                    Toolbar = new Toolbar(device, loginObject);
+                    Events = new Events(device, loginObject);
+                }
+
+                isConnected = value;
+            }
+        }
+
+        public AccountsV2 AccountsV2 { get; private set; }
+        public DownloadController DownloadController { get; private set; }
+        public Extensions Extensions { get; private set; }
+        public Extraction Extraction { get; private set; }
+        public LinkCrawler LinkCrawler { get; private set; }
+        public LinkGrabberV2 LinkgrabberV2 { get; private set; }
+        public DownloadsV2 DownloadsV2 { get; private set; }
+        public Update Update { get; private set; }
+        public Jd Jd { get; private set; }
+        public Toolbar Toolbar { get; private set; }
+        public Events Events { get; private set; }
+        public Namespaces.System System { get; private set; }
 
         public event EventHandler<SubscriptionEventArgs> SubscriptionEvent;
         private Timer timer;
         private readonly SemaphoreSlim isBusy;
 
 
-        internal DeviceHandler(DeviceObject device, LoginObject loginObject, bool useDirectConnect = true)
+        internal DeviceHandler(DeviceObject device, LoginObject loginObject, bool useDirectConnect = false)
         {
             this.device = device;
             this.loginObject = loginObject;
 
-            AccountsV2 = new AccountsV2(this.device);
-            DownloadController = new DownloadController(this.device);
-            Extensions = new Extensions(this.device);
-            Extraction = new Extraction(this.device);
-            LinkCrawler = new LinkCrawler(this.device);
-            LinkgrabberV2 = new LinkGrabberV2(this.device);
-            DownloadsV2 = new DownloadsV2(this.device);
-            Update = new Update(this.device);
-            Jd = new JD(this.device);
-            System = new Namespaces.System(this.device);
-            Toolbar = new Toolbar(this.device);
-            Events = new Events(this.device);
             if (useDirectConnect)
                 DirectConnect();
             else
-                Connect("http://api.jdownloader.org").Wait();
+                Connect(JdApiUrl).Wait();
+
+            //Events
             isBusy = new SemaphoreSlim(1, 1);
             StartPolling();
         }
@@ -89,7 +105,7 @@ namespace My.JDownloader.Api
 
             if (connected == false)
             {
-                Connect("http://api.jdownloader.org").Wait();
+                Connect(JdApiUrl).Wait();
             }
         }
 
@@ -122,12 +138,11 @@ namespace My.JDownloader.Api
             return true;
         }
 
-        private async Task<List<DeviceConnectionInfoObject>> GetDirectConnectionInfos()
+        private async Task<List<DirectConnectionInfo>> GetDirectConnectionInfos()
         {
-            var tmp = await JDownloaderApiHandler.CallAction<DeviceConnectionInfoReturnObject>(device, "/device/getDirectConnectionInfos",
-                null, loginObject);
+            var tmp = await Utils.CallAction<DeviceConnectionInfo>(device, loginObject, "/device/getDirectConnectionInfos", null);
             if (string.IsNullOrEmpty(tmp.ToString()))
-                return new List<DeviceConnectionInfoObject>();
+                return new List<DirectConnectionInfo>();
 
             return tmp.Infos;
         }

@@ -6,13 +6,13 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
     public class AddLinksQuery
     {
         [JsonProperty(PropertyName = "assignJobID")]
-        public bool? AssignJobID { get; set; }
+        public bool? AssignJobId { get; set; }
         [JsonProperty(PropertyName = "autoExtract")]
         public bool? AutoExtract { get; set; }
         [JsonProperty(PropertyName = "autostart")]
         public bool? Autostart { get; set; }
         [JsonProperty(PropertyName = "dataURLs")]
-        public string[] DataURLs { get; set; }
+        public string[] DataUrLs { get; set; }
         [JsonProperty(PropertyName = "deepDecrypt")]
         public bool? DeepDecrypt { get; set; }
         [JsonProperty(PropertyName = "destinationFolder")]
@@ -34,7 +34,7 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
 
         public AddLinksQuery()
         {
-            AssignJobID = null;
+            AssignJobId = null;
             AutoExtract = null;
             Autostart = null;
             DeepDecrypt = null;

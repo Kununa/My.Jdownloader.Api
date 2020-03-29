@@ -5,8 +5,12 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+using My.JDownloader.Api.ApiObjects.Action;
+using My.JDownloader.Api.ApiObjects.Devices;
+using My.JDownloader.Api.ApiObjects.Login;
+using Newtonsoft.Json;
 using Polly;
-using Polly.Retry;
 
 namespace My.JDownloader.Api
 {
@@ -15,9 +19,54 @@ namespace My.JDownloader.Api
         internal static string ServerDomain = "server";
         internal static string DeviceDomain = "device";
         internal static string AppKey = "my.jdownloader.api.wrapper";
-        private static readonly HttpClient HttpClient = new HttpClient();
-        static readonly AsyncPolicy AsyncRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        private static readonly HttpClient httpClient = new HttpClient();
+        static readonly AsyncPolicy asyncRetryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(4, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         public static string ApiUrl = "http://api.jdownloader.org";
+
+        public static async Task<T> CallAction<T>(DeviceObject device, LoginObject loginObject,string action, object param, bool eventListener = false)
+        {
+            if (device == null)
+                throw new ArgumentNullException(nameof(device), "The device can't be null.");
+            if (string.IsNullOrEmpty(device.Id))
+                throw new ArgumentException("The id of the device is empty. Please call again the GetDevices Method and try again.", nameof(device));
+
+            var query = $"/t_{HttpUtility.UrlEncode(loginObject.SessionToken)}_{HttpUtility.UrlEncode(device.Id)}{action}";
+            var callActionObject = new CallActionObject
+            {
+                ApiVer = 1,
+                Params = param,
+                RequestId = Utils.GetUniqueRid(),
+                Url = action
+            };
+
+            var url = Utils.ApiUrl + query;
+            var json = JsonConvert.SerializeObject(callActionObject);
+            var encryptedJson = Utils.Encrypt(json, loginObject.DeviceEncryptionToken);
+            var encryptedResponse = await Utils.PostMethod(url, encryptedJson, eventListener);
+
+            if (encryptedResponse == null)
+                return default;
+
+            var decryptedResponse = Utils.Decrypt(encryptedResponse, loginObject.DeviceEncryptionToken);
+            if (decryptedResponse == null)
+                return default;
+
+            //special case as event responses are completly differerent
+            if (decryptedResponse.Contains("subscriptionid"))
+            {
+                var direct = JsonConvert.DeserializeObject<T>(decryptedResponse);
+                if (direct != null)
+                    return direct;
+            }
+            var res = JsonConvert.DeserializeObject<ApiObjects.DefaultReturnObject>(decryptedResponse);
+            if (res == null || res.Data == null)
+                return default;
+            if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JObject))
+                return ((Newtonsoft.Json.Linq.JObject)res.Data).ToObject<T>();
+            if (res.Data.GetType() == typeof(Newtonsoft.Json.Linq.JArray))
+                return ((Newtonsoft.Json.Linq.JArray)res.Data).ToObject<T>();
+            return (T)res.Data;
+        }
 
         #region "Secret and Encryption tokens"
 
@@ -26,16 +75,16 @@ namespace My.JDownloader.Api
             return EncodeStringToSha256(email.ToLower() + password + domain);
         }
 
-        internal static readonly SHA256Managed _Sha256Managed = new SHA256Managed();
+        internal static readonly SHA256Managed SHA256_MANAGED = new SHA256Managed();
 
         internal static byte[] EncodeStringToSha256(string text)
         {
-            return _Sha256Managed.ComputeHash(Encoding.UTF8.GetBytes(text));
+            return SHA256_MANAGED.ComputeHash(Encoding.UTF8.GetBytes(text));
         }
 
-        internal static byte[] UpdateEncryptionToken(byte[] oldToken, string UpdatedToken)
+        internal static byte[] UpdateEncryptionToken(byte[] oldToken, string updatedToken)
         {
-            var newToken = GetByteArrayByHexString(UpdatedToken);
+            var newToken = GetByteArrayByHexString(updatedToken);
             var newHash = new byte[oldToken.Length + newToken.Length];
             oldToken.CopyTo(newHash, 0);
             newToken.CopyTo(newHash, 32);
@@ -65,7 +114,7 @@ namespace My.JDownloader.Api
                     return null;
 
                 var content = new StringContent(body, Encoding.UTF8, "application/aesjson");
-                using (var response = eventListener ? await HttpClient.PostAsync(url, content) : await AsyncRetryPolicy.ExecuteAsync(() => HttpClient.PostAsync(url, content)))
+                using (var response = eventListener ? await httpClient.PostAsync(url, content) : await asyncRetryPolicy.ExecuteAsync(() => httpClient.PostAsync(url, content)))
                 {
                     if (response != null)
                     {

@@ -1,26 +1,21 @@
 ﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
+using My.JDownloader.Api.ApiObjects.Login;
 
 namespace My.JDownloader.Api.Namespaces
 {
-    public class JD
+    public class Jd : NamespaceBase
     {
-        private readonly DeviceObject _Device;
-
-        internal JD(DeviceObject device)
-        {
-            _Device = device;
-        }
+        public Jd(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
 
         /// <summary>
         /// Keep an eye on your JDownloader Client ;)
         /// </summary>
-        public async Task DoSomethingCool()
+        public async Task<bool> DoSomethingCool()
         {
-            var response = await JDownloaderApiHandler.CallAction<object>(_Device, "/jd/doSomethingCool",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallAction<object>("/jd/doSomethingCool", null);
+            return response != null;
         }
 
         /// <summary>
@@ -29,8 +24,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns the core revision of the jdownloader client.</returns>
         public async Task<int> GetCoreRevision()
         {
-            var response = await JDownloaderApiHandler.CallAction<int>(_Device, "/jd/getCoreRevision",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallAction<int>("/jd/getCoreRevision", null);
 
             return response;
         }
@@ -41,8 +35,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> RefreshPlugins()
         {
-            var response = await JDownloaderApiHandler.CallAction<bool>(_Device, "/jd/refreshPlugins",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallAction<bool>("/jd/refreshPlugins", null);
 
             return response;
         }
@@ -55,9 +48,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns the sum of two numbers.</returns>
         public async Task<int> Sum(int a, int b)
         {
-            var param = new[] {a, b};
-            var response = await JDownloaderApiHandler.CallAction<int>(_Device, "/jd/sum",
-                param, JDownloaderHandler.LoginObject);
+            var param = new[] { a, b };
+            var response = await CallAction<int>("/jd/sum", param);
 
             return response;
         }
@@ -68,8 +60,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current uptime of the JDownloader client as long.</returns>
         public async Task<long> Uptime()
         {
-            var response = await JDownloaderApiHandler.CallAction<long>(_Device, "/jd/uptime",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallAction<long>("/jd/uptime", null);
 
             return response;
         }
@@ -80,8 +71,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current version of the JDownloader client.</returns>
         public async Task<long> Version()
         {
-            var response = await JDownloaderApiHandler.CallAction<long>(_Device, "/jd/version",
-                null, JDownloaderHandler.LoginObject);
+            var response = await CallAction<long>("/jd/version", null);
 
             return response;
         }
