@@ -35,11 +35,11 @@ So far the library contains the following namespaces and methods:
   
 - DownloadController | 6/6 calls done
 
-- DownloadsV2 | 2/x calls done
+- DownloadsV2 | 9/26 calls done
 	
 - Extensions | 5/5 calls done
 
-- Extraction | 6/7 calls done
+- Extraction | 7/7 calls done
 
 - JD | 6/6 calls done
 	
@@ -48,6 +48,8 @@ So far the library contains the following namespaces and methods:
 - LinkGrabberV2 | 19/30 calls done
 	
 - System | 7/7 calls done
+
+- Toolbar | 3/15 calls done
 
 - Update | 3/3 calls done
 
