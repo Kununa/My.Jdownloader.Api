@@ -11,7 +11,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Extensions : NamespaceBase
     {
-        public Extensions(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public Extensions(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "extensions") { }
 
         /// <summary>
         /// Installs an extension to the client.
@@ -21,7 +21,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> Install(string extensionId)
         {
             var param = new[] { extensionId };
-            var response = await CallAction<bool>("/extensions/install", param);
+            var response = await CallAction<bool>("install", param);
 
             return response;
         }
@@ -34,7 +34,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsEnabled(string className)
         {
             var param = new[] { className };
-            var response = await CallAction<bool>("/extensions/isEnabled", param);
+            var response = await CallAction<bool>("isEnabled", param);
 
             return response;
         }
@@ -47,7 +47,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsInstalled(string extensionId)
         {
             var param = new[] { extensionId };
-            var response = await CallAction<bool>("/extensions/isInstalled", param);
+            var response = await CallAction<bool>("isInstalled", param);
 
             return response;
         }
@@ -61,7 +61,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
-            var response = await CallAction<IReadOnlyList<ExtensionResponseObject>>("/extensions/list", param);
+            var response = await CallAction<IReadOnlyList<ExtensionResponseObject>>("list", param);
 
             return response;
 
@@ -76,7 +76,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> SetEnabled(string className, bool enabled)
         {
             var param = new[] { className, enabled.ToString() };
-            var response = await CallAction<DefaultReturnObject>("/extensions/setEnabled", param);
+            var response = await CallAction<DefaultReturnObject>("setEnabled", param);
 
             return response?.Data != null;
         }

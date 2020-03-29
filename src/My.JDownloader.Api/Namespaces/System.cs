@@ -9,14 +9,14 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class System : NamespaceBase
     {
-        public System(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public System(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "system") { }
 
         /// <summary>
         /// Closes the JDownloader client.
         /// </summary>
         public async Task ExitJd()
         {
-            await CallAction<object>("/system/exitJD", null);
+            await CallAction<object>("exitJD", null);
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<StorageInfoReturnObject>> GetStorageInfos(string path)
         {
             var param = new[] { path };
-            var tmp = await CallAction<IReadOnlyList<StorageInfoReturnObject >> ("/system/getStorageInfos", param);
+            var tmp = await CallAction<IReadOnlyList<StorageInfoReturnObject >> ("getStorageInfos", param);
 
             return tmp;
         }
@@ -38,7 +38,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<SystemInfoReturnObject> GetSystemInfos()
         {
-            return await CallAction<SystemInfoReturnObject>("/system/getSystemInfos", null);
+            return await CallAction<SystemInfoReturnObject>("getSystemInfos", null);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task HibernateOs()
         {
-            await CallAction<object>("/system/hibernateOS", null);
+            await CallAction<object>("hibernateOS", null);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartJd()
         {
-            await CallAction<object>("/system/restartJD", null);
+            await CallAction<object>("restartJD", null);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="force">True if you want to force the shutdown process.</param>
         public async Task ShutdownOs(bool force)
         {
-            await CallAction<object>("/system/shutdownOS", new[] { force });
+            await CallAction<object>("shutdownOS", new[] { force });
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task StandbyOs()
         {
-            await CallAction<object>("/system/standbyOS", null);
+            await CallAction<object>("standbyOS", null);
         }
     }
 }

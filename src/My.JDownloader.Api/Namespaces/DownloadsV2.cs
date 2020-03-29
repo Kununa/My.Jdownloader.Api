@@ -1,4 +1,5 @@
-﻿using My.JDownloader.Api.ApiHandler;
+﻿using System;
+using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.DownloadsV2;
@@ -11,13 +12,13 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class DownloadsV2 : NamespaceBase
     {
-        public DownloadsV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public DownloadsV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "downloadsV2") { }
 
         public async Task<bool> Cleanup(long[] linkIds, long[] packageIds, Enums.Action action, Enums.Mode mode, Enums.SelectionType selectionType)
         {
-            var param = new object[] { linkIds, packageIds, action.ToString(),  mode.ToString(), selectionType.ToString() };
+            var param = new object[] { linkIds, packageIds, action.ToString(), mode.ToString(), selectionType.ToString() };
             var response =
-                await CallAction<string>("/downloadsV2/cleanup", param);
+                await CallAction<string>("cleanup", param);
             return response != null;
         }
 
@@ -25,7 +26,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { linkIds, packageIds };
             var response =
-                await CallAction<bool>("/downloadsV2/queryPackages", param);
+                await CallAction<bool>("queryPackages", param);
             return response;
         }
 
@@ -34,7 +35,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds, packageIds };
 
             var response =
-                await JDownloaderApiHandler.CallAction<bool>(_Device, "/downloadsV2/queryPackages", param,
+                await JDownloaderApiHandler.CallAction<bool>(_Device, "queryPackages", param,
                     JDownloaderHandler.LoginObject);
             return response;
         }*/
@@ -45,7 +46,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The stop mark as long.</returns>
         public async Task<long> GetStopMark()
         {
-            var response = await CallAction<long>("/downloadsV2/getStopMark", null);
+            var response = await CallAction<long>("getStopMark", null);
             return response;
         }
 
@@ -55,7 +56,70 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns informations about a stop marked link.</returns>
         public async Task<DownloadLink> GetStopMarkedLink()
         {
-            var response = await CallAction<DownloadLink>("/downloadsV2/getStopMarkedLink", null);
+            var response = await CallAction<DownloadLink>("getStopMarkedLink", null);
+            return response;
+        }
+
+        public async Task<long> GetStructureChangeCounter(long oldCounterValue)
+        {
+            var param = new object[] { oldCounterValue };
+            var response = await CallAction<long>("getStructureChangeCounter", param);
+            return response;
+        }
+
+        public async Task<bool> MoveLinks(long[] packageIds, long afterLinkID, long? destPackageId)
+        {
+            var param = new object[] { packageIds, afterLinkID, destPackageId };
+
+            var response =
+                await CallAction<object>(" moveLinks", param);
+            return response != null;
+        }
+
+        /// <summary>
+        /// Moves one or multiple packages after antoher package.
+        /// </summary>
+        /// <param name="packageIds">The ids of the packages you want to move.</param>
+        /// <param name="afterDestPackageId">The id of the package you want to move the others to.</param>
+        /// <returns>True if successfull.</returns>
+        public async Task<bool> MovePackages(long[] packageIds, long afterDestPackageId)
+        {
+            var param = new object[] { packageIds, afterDestPackageId };
+
+            var response =
+                await CallAction<object>("movePackages", param);
+            return response != null;
+        }
+
+        public async Task<bool> MovetoNewPackage(long[] linkIds, long[] pkgIds, string newPkgName, string downloadPath)
+        {
+            var param = new object[] { linkIds, pkgIds, newPkgName, downloadPath };
+
+            var response =
+                await CallAction<object>("movetoNewPackage", param);
+            return response != null;
+        }
+
+        public async Task<int> PackageCount()
+        {
+            var response = await CallAction<int>("packageCount", null);
+            return response;
+        }
+
+        /// <summary>
+        /// Gets all links that are currently in the download list.
+        /// </summary>
+        /// <param name="queryLink">The request object which contains properties to define the return properties.</param>
+        /// <returns>Returns a list of all links that are currently in the download list.</returns>
+        public async Task<IReadOnlyList<DownloadLink>> QueryLinks(LinkQuery queryLink)
+        {
+            if (queryLink == null)
+                queryLink = new LinkQuery();
+            var json = JsonConvert.SerializeObject(queryLink);
+            var param = new[] { json };
+
+            var response =
+                await CallAction<IReadOnlyList<DownloadLink>>("queryLinks", param);
             return response;
         }
 
@@ -72,23 +136,8 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { json };
 
             var response =
-                await CallAction<IReadOnlyList<FilePackage>>("/downloadsV2/queryPackages", param);
+                await CallAction<IReadOnlyList<FilePackage>>("queryPackages", param);
             return response;
-        }
-
-        /// <summary>
-        /// Moves one or multiple packages after antoher package.
-        /// </summary>
-        /// <param name="packageIds">The ids of the packages you want to move.</param>
-        /// <param name="afterDestPackageId">The id of the package you want to move the others to.</param>
-        /// <returns>True if successfull.</returns>
-        public async Task<bool> MovePackages(long[] packageIds, long afterDestPackageId)
-        {
-            var param = new object[] { packageIds, afterDestPackageId };
-
-            var response =
-                await CallAction<object>("/downloadsV2/movePackages", param);
-            return response != null;
         }
 
         /// <summary>
@@ -102,7 +151,31 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds ?? new long[0], packageIds ?? new long[0] };
 
             var response =
-                await CallAction<object>("/downloadsV2/removeLinks", param);
+                await CallAction<object>("removeLinks", param);
+            return response != null;
+        }
+
+        public async Task<int> RemoveStopMark()
+        {
+            var response = await CallAction<int>("removeStopMark", null);
+            return response;
+        }
+
+        public async Task<bool> RenameLink(long linkId, string newName)
+        {
+            var param = new object[] { linkId, newName };
+
+            var response =
+                await CallAction<object>("renameLink", param);
+            return response != null;
+        }
+
+        public async Task<bool> RenamePackage(long packageId, string newName)
+        {
+            var param = new object[] { packageId, newName };
+
+            var response =
+                await CallAction<object>("renamePackage", param);
             return response != null;
         }
 
@@ -117,25 +190,89 @@ namespace My.JDownloader.Api.Namespaces
             var param = new object[] { linkIds ?? new long[0], packageIds ?? new long[0] };
 
             var response =
-                await CallAction<object>("/downloadsV2/resetLinks", param);
+                await CallAction<object>("resetLinks", param);
             return response != null;
         }
 
-        /// <summary>
-        /// Gets all links that are currently in the download list.
-        /// </summary>
-        /// <param name="queryLink">The request object which contains properties to define the return properties.</param>
-        /// <returns>Returns a list of all links that are currently in the download list.</returns>
-        public async Task<IReadOnlyList<DownloadLink>> QueryLinks(LinkQuery queryLink)
+        public async Task<bool> ResumeLinks(long[] linkIds = null, long[] packageIds = null)
         {
-            if (queryLink == null)
-                queryLink = new LinkQuery();
-            var json = JsonConvert.SerializeObject(queryLink);
-            var param = new[] { json };
+            var param = new object[] { linkIds ?? new long[0], packageIds ?? new long[0] };
 
             var response =
-                await CallAction<IReadOnlyList<DownloadLink>>("/downloadsV2/queryLinks", param);
+                await CallAction<object>("resumeLinks", param);
+            return response != null;
+        }
+
+        public async Task<bool> SetDownloadDirectory(string directory, long[] packageIds)
+        {
+            var param = new object[] { directory, packageIds };
+
+            var response =
+                await CallAction<object>("setDownloadDirectory", param);
+            return response != null;
+        }
+
+        public async Task<bool> SetDownloadPassword(string pass, long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { linkIds, packageIds, pass };
+
+            var response =
+                await CallAction<bool>("setDownloadPassword", param);
             return response;
+        }
+
+        public async Task<bool> SetEnabled(bool enabled, long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { enabled, linkIds, packageIds };
+
+            var response =
+                await CallAction<object>("setEnabled", param);
+            return response != null;
+        }
+
+        public async Task<bool> SetPriority(Enums.PriorityType priority, long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { priority, linkIds, packageIds };
+
+            var response =
+                await CallAction<object>("setPriority", param);
+            return response != null;
+        }
+
+        public async Task<bool> SetStopMark(long? linkId ,long? packageId)
+        {
+            var param = new object[] { linkId, packageId };
+
+            var response =
+                await CallAction<object>("setStopMark", param);
+            return response != null;
+        }
+
+        public async Task<bool> SplitPackageByHoster( long[] linkIds = null, long[] pkgIds = null)
+        {
+            var param = new object[] { linkIds, pkgIds };
+
+            var response =
+                await CallAction<object>("splitPackageByHoster", param);
+            return response != null;
+        }
+
+        public async Task<bool> startOnlineStatusCheck(long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { linkIds, packageIds };
+
+            var response =
+                await CallAction<object>("startOnlineStatusCheck", param);
+            return response != null;
+        }
+
+        public async Task<bool> Unskip(Enums.Reason filterByReason, long[] linkIds = null, long[] packageIds = null)
+        {
+            var param = new object[] { packageIds, linkIds, filterByReason };
+
+            var response =
+                await CallAction<object>("setEnabled", param);
+            return response != null;
         }
 
     }

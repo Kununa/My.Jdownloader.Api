@@ -12,7 +12,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class LinkGrabberV2 : NamespaceBase
     {
-        public LinkGrabberV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public LinkGrabberV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "linkgrabberv2") { }
 
         /// <summary>
         /// Aborts the linkgrabber process.
@@ -34,7 +34,7 @@ namespace My.JDownloader.Api.Namespaces
             if (jobId == -1)
                 param = null;
 
-            var response = await CallAction<bool>("/linkgrabberv2/abort", param);
+            var response = await CallAction<bool>("abort", param);
 
             return response;
         }
@@ -54,7 +54,7 @@ namespace My.JDownloader.Api.Namespaces
 
             var json = JsonConvert.SerializeObject(containerObject);
             var param = new[] { json };
-            var response = await CallAction<object>("/linkgrabberv2/addContainer", param);
+            var response = await CallAction<object>("addContainer", param);
             return response != null;
         }
 
@@ -85,7 +85,7 @@ namespace My.JDownloader.Api.Namespaces
                 DefaultValueHandling = DefaultValueHandling.Include
             });
             var param = new[] { json };
-            var response = await CallAction<LinkCollectingJob>("/linkgrabberv2/addLinks", param);
+            var response = await CallAction<LinkCollectingJob>("addLinks", param);
             return response.Id;
         }
 
@@ -102,7 +102,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new[]
                 {linkId.ToString(), destinationAfterLinkId.ToString(), destinationPackageId.ToString(), variantId};
-            var response = await CallAction<DefaultReturnObject>("/linkgrabberv2/addVariantCopy", param);
+            var response = await CallAction<DefaultReturnObject>("addVariantCopy", param);
             return response != null;
         }
 
@@ -119,7 +119,7 @@ namespace My.JDownloader.Api.Namespaces
             CleanUpSelectionType selection)
         {
             var param = new object[] { linkIds, packageIds, action, mode, selection };
-            var response = await CallAction<object>("/linkgrabberv2/cleanUp", param);
+            var response = await CallAction<object>("cleanUp", param);
             if (response == null)
                 return false;
             return true;
@@ -131,7 +131,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull</returns>
         public async Task<bool> ClearList()
         {
-            var response = await CallAction<object>("/linkgrabberv2/clearList", null);
+            var response = await CallAction<object>("clearList", null);
             if (response == null)
                 return false;
             return true;
@@ -144,7 +144,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<long> GetChildrenChanged(long structureWatermark)
         {
-            var response = await CallAction<long>("/linkgrabberv2/getChildrenChanged", null);
+            var response = await CallAction<long>("getChildrenChanged", null);
 
             return response;
         }
@@ -155,7 +155,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>An array which contains the download folder history.</returns>
         public async Task<string[]> GetDownloadFolderHistorySelectionBase()
         {
-            var response = await CallAction<string[]>("/linkgrabberv2/getDownloadFolderHistorySelectionBase", null);
+            var response = await CallAction<string[]>("getDownloadFolderHistorySelectionBase", null);
 
             return response;
         }
@@ -170,7 +170,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<long>>> GetDownloadUrls(long[] links, long afterLinkId, long destPackageId)
         {
-            var response = await CallAction<IReadOnlyDictionary<string, IReadOnlyList<long>>>("/linkgrabberv2/getDownloadUrls", null);
+            var response = await CallAction<IReadOnlyDictionary<string, IReadOnlyList<long>>>("getDownloadUrls", null);
             return response;
         }
 
@@ -180,7 +180,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The amount of links which are in the linkcollector.</returns>
         public async Task<int> GetPackageCount()
         {
-            var response = await CallAction<int>("/linkgrabberv2/getPackageCount", null);
+            var response = await CallAction<int>("getPackageCount", null);
             return response;
         }
 
@@ -191,7 +191,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns variants of this link.</returns>
         public async Task<IReadOnlyList<GetVariantsReturnObject>> GetVariants(long linkId)
         {
-            var response = await CallAction<IReadOnlyList<GetVariantsReturnObject>>("/linkgrabberv2/getVariants", null);
+            var response = await CallAction<IReadOnlyList<GetVariantsReturnObject>>("getVariants", null);
             return response;
         }
 
@@ -201,7 +201,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns true or false. Depending on if the client is still collecting files.</returns>
         public async Task<bool> IsCollecting()
         {
-            var response = await CallAction<object>("/linkgrabberv2/isCollection", null);
+            var response = await CallAction<object>("isCollection", null);
             return response != null;
         }
 
@@ -216,7 +216,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { linkIds, afterLinkId, destPackageId };
 
-            var response = await CallAction<object>("/linkgrabberv2/moveLinks", param);
+            var response = await CallAction<object>("moveLinks", param);
             return response != null;
         }
 
@@ -230,7 +230,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { packageIds, afterDestPackageId };
 
-            var response = await CallAction<object>("/linkgrabberv2/movePackages", param);
+            var response = await CallAction<object>("movePackages", param);
             return response != null;
         }
 
@@ -244,7 +244,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new[] { linkIds, packageIds };
 
-            var response = await CallAction<object>("/linkgrabberv2/moveToDownloadlist", param);
+            var response = await CallAction<object>("moveToDownloadlist", param);
             return response != null;
         }
 
@@ -260,7 +260,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new object[] { linkIds, packageIds, newPackageName, downloadPath };
 
-            var response = await CallAction<object>("/linkgrabberv2/movetoNewPackage", param);
+            var response = await CallAction<object>("movetoNewPackage", param);
             return response != null;
         }
 
@@ -273,7 +273,7 @@ namespace My.JDownloader.Api.Namespaces
             var json = JsonConvert.SerializeObject(query);
             var param = new[] { json };
 
-            var response = await CallAction<IReadOnlyList<QueryLinksResponseObject>>("/linkgrabberv2/queryLinks", param);
+            var response = await CallAction<IReadOnlyList<QueryLinksResponseObject>>("queryLinks", param);
             return response;
         }
 
@@ -287,7 +287,7 @@ namespace My.JDownloader.Api.Namespaces
             var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
 
-            var response = await CallAction<IReadOnlyList<CrawledPackage>>("/linkgrabberv2/queryPackages", param);
+            var response = await CallAction<IReadOnlyList<CrawledPackage>>("queryPackages", param);
             return response;
         }
 
@@ -300,14 +300,14 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> SetDownloadDirectory(string directory, long[] packageIds)
         {
             var param = new object[] { directory, packageIds };
-            var response = await CallAction<object>("/linkgrabberv2/setDownloadDirectory", param);
+            var response = await CallAction<object>("setDownloadDirectory", param);
             return response != null;
         }
 
         public async Task<bool> RemoveLinks(long[] linkIds, long[] packageIds)
         {
             var param = new object[] { linkIds, packageIds };
-            var response = await CallAction<object>("/linkgrabberv2/removeLinks", param);
+            var response = await CallAction<object>("removeLinks", param);
             return response != null;
         }
     }

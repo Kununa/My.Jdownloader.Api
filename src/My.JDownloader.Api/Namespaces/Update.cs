@@ -7,7 +7,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Update : NamespaceBase
     {
-        public Update(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public Update(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "update") { }
 
         /// <summary>
         /// Checks if the client has an update available.
@@ -15,7 +15,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if an update is available.</returns>
         public async Task<bool> IsUpdateAvailable()
         {
-            var response = await CallAction<bool>("/update/isUpdateAvailable", null);
+            var response = await CallAction<bool>("isUpdateAvailable", null);
 
             return response;
         }
@@ -25,7 +25,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartAndUpdate()
         {
-            await CallAction<object>("/update/restartAndUpdate", null);
+            await CallAction<object>("restartAndUpdate", null);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RunUpdateCheck()
         {
-            await CallAction<object>("/update/runUpdateCheck", null);
+            await CallAction<object>("runUpdateCheck", null);
         }
     }
 }

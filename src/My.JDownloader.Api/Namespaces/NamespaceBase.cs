@@ -12,16 +12,18 @@ namespace My.JDownloader.Api.Namespaces
     {
         private readonly DeviceObject device;
         private readonly LoginObject loginObject;
+        private readonly string baseUrl;
 
-        internal NamespaceBase(DeviceObject device, LoginObject loginObject)
+        internal NamespaceBase(DeviceObject device, LoginObject loginObject, string baseUrl)
         {
             this.device = device;
             this.loginObject = loginObject;
+            this.baseUrl = baseUrl;
         }
 
-        protected async Task<T> CallAction<T>( string action, object param, bool eventListener = false)
+        protected async Task<T> CallAction<T>(string action, object param, bool eventListener = false)
         {
-            return await Utils.CallAction<T>(device, loginObject, action, param, eventListener);
+            return await Utils.CallAction<T>(device, loginObject, "/" + baseUrl + "/" + action, param, eventListener);
         }
 
         protected async Task<T> CallEventAction<T>(string action, object param, bool eventListener = false)

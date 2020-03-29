@@ -8,7 +8,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class DownloadController : NamespaceBase
     {
-        public DownloadController(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public DownloadController(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "downloadcontroller") { }
 
         /// <summary>
         /// Forces JDownloader to start downloading the given links/packages
@@ -19,7 +19,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> ForceDownload(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var result = await CallAction<DefaultReturnObject>("/downloadcontroller/forceDownload", param);
+            var result = await CallAction<DefaultReturnObject>("forceDownload", param);
             return result != null;
         }
 
@@ -29,7 +29,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current state of the device.</returns>
         public async Task<string> GetCurrentState()
         {
-            var result = await CallAction<string>("/downloadcontroller/getCurrentState", null);
+            var result = await CallAction<string>("getCurrentState", null);
             if (result != null)
                 return result;
             return "UNKOWN_STATE";
@@ -41,7 +41,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The actual download speed.</returns>
         public async Task<long> GetSpeedInBps()
         {
-            var result = await CallAction<long>("/downloadcontroller/getSpeedInBps", null);
+            var result = await CallAction<long>("getSpeedInBps", null);
             return result;
         }
 
@@ -51,7 +51,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Start()
         {
-            var result = await CallAction<bool>("/downloadcontroller/start", null);
+            var result = await CallAction<bool>("start", null);
             return result;
         }
 
@@ -61,7 +61,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Stop()
         {
-            var result = await CallAction<bool>("/downloadcontroller/stop", null);
+            var result = await CallAction<bool>("stop", null);
             return result;
         }
 
@@ -73,7 +73,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> Pause(bool pause)
         {
             var param = new[] { pause };
-            var result = await CallAction<bool>("/downloadcontroller/pause", param);
+            var result = await CallAction<bool>("pause", param);
 
             return result;
         }

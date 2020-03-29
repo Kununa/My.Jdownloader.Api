@@ -35,7 +35,7 @@ So far the library contains the following namespaces and methods:
   
 - DownloadController | 6/6 calls done
 
-- DownloadsV2 | 9/26 calls done
+- DownloadsV2 | 26/26 calls done
 	
 - Extensions | 5/5 calls done
 

@@ -10,7 +10,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Toolbar : NamespaceBase
     {
-        public Toolbar(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public Toolbar(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "toolbar") { }
 
         /// <summary>
         /// Toggles the automatic reconnect function.
@@ -18,7 +18,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleAutomaticReconnect()
         {
-            var tmp = await CallAction<bool>("/toolbar/toggleAutomaticReconnect", null);
+            var tmp = await CallAction<bool>("toggleAutomaticReconnect", null);
 
             return tmp;
         }
@@ -29,7 +29,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleDownloadSpeedLimit()
         {
-            var tmp = await CallAction<bool>("/toolbar/toggleDownloadSpeedLimit", null);
+            var tmp = await CallAction<bool>("toggleDownloadSpeedLimit", null);
 
             return tmp;
         }
@@ -40,7 +40,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<StatusObject> GetStatus()
         {
-            var tmp = await CallAction<DefaultReturnObject>("/toolbar/getStatus", null);
+            var tmp = await CallAction<DefaultReturnObject>("getStatus", null);
 
             var data = (JObject)tmp?.Data;
             return data?.ToObject<StatusObject>();

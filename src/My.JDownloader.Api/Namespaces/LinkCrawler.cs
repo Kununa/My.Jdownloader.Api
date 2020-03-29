@@ -7,7 +7,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class LinkCrawler : NamespaceBase
     {
-        public LinkCrawler(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public LinkCrawler(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "linkcrawler") { }
 
         /// <summary>
         /// Asks the client if the linkcrawler is still crawling.
@@ -16,7 +16,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> IsCrawling()
         {
             var response =
-                await CallAction<bool>("/linkcrawler/isCrawling", null);
+                await CallAction<bool>("isCrawling", null);
             return response;
         }
     }

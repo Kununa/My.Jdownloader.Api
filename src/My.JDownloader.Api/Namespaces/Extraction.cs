@@ -9,7 +9,7 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class Extraction : NamespaceBase
     {
-        public Extraction(DeviceObject device, LoginObject loginObject) : base(device, loginObject) { }
+        public Extraction(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "extraction") { }
 
         /// <summary>
         /// Adds an archive password to the client.
@@ -19,7 +19,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> AddArchivePassword(string password)
         {
             var param = new[] { password };
-            var response = await CallAction<bool>("/extraction/addArchivePassword", param);
+            var response = await CallAction<bool>("addArchivePassword", param);
 
             return response;
         }
@@ -32,7 +32,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<bool> CancelExtraction(string controllerId)
         {
             var param = new[] { controllerId };
-            var response = await CallAction<bool>("/extraction/cancelExtraction", param);
+            var response = await CallAction<bool>("cancelExtraction", param);
 
             return response;
         }
@@ -40,7 +40,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<ArchiveStatus> GetArchiveInfo(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var response = await CallAction<ArchiveStatus>("/extraction/cancelExtraction", param);
+            var response = await CallAction<ArchiveStatus>("cancelExtraction", param);
 
             return response;
         }
@@ -48,21 +48,21 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<ArchiveSettings>> GetArchiveSettings(string[] archiveIds)
         {
             var param = new[] { archiveIds };
-            var response = await CallAction<IReadOnlyList<ArchiveSettings>>("/extraction/cancelExtraction", param);
+            var response = await CallAction<IReadOnlyList<ArchiveSettings>>("cancelExtraction", param);
 
             return response;
         }
 
         public async Task<IReadOnlyList<ArchiveStatus>> GetQueue()
         {
-            var response = await CallAction<IReadOnlyList<ArchiveStatus>>("/extraction/cancelExtraction", null);
+            var response = await CallAction<IReadOnlyList<ArchiveStatus>>("cancelExtraction", null);
             return response;
         }
 
         public async Task<bool> SetArchiveSettings(string archiveId, ArchiveSettings archiveSettings)
         {
             var param = new object[] { archiveId, archiveSettings };
-            var response = await CallAction<bool>("/extraction/cancelExtraction", param);
+            var response = await CallAction<bool>("cancelExtraction", param);
 
             return response;
         }
@@ -70,7 +70,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyDictionary<string, bool>> StartExtractionNow(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var response = await CallAction<IReadOnlyDictionary<string, bool>>("/extraction/cancelExtraction", param);
+            var response = await CallAction<IReadOnlyDictionary<string, bool>>("cancelExtraction", param);
 
             return response;
         }
