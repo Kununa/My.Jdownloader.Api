@@ -67,6 +67,11 @@ if (_JDownloaderHandler.IsConnected)
     
     var deviceHandler = _JDownloaderHandler.GetDeviceInstance(devices[0]);
     deviceHandler.AccountV2.AddAccount("mega.co.nz", "test123", "test123");
+    
+    //Or
+    
+    var deviceHandler = _JDownloaderHandler.GetDevice("NAME_OF_JD_INSTANCE");
+    
 }
 ``` 
 
