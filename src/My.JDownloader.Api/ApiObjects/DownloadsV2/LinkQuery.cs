@@ -1,4 +1,6 @@
-﻿namespace My.JDownloader.Api.ApiObjects.DownloadsV2
+﻿using System;
+
+namespace My.JDownloader.Api.ApiObjects.DownloadsV2
 {
     public class LinkQuery
     {
@@ -47,6 +49,8 @@
 
         public LinkQuery(uint maxResults = 100)
         {
+            if(maxResults>1000)
+                Console.WriteLine("Querying over 1000 links can be problematic");
             MaxResults = maxResults;
         }
     }

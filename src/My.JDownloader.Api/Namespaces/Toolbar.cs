@@ -1,8 +1,5 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
-using My.JDownloader.Api.ApiObjects.Devices;
+﻿using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Toolbar;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Login;
 
@@ -18,9 +15,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleAutomaticReconnect()
         {
-            var tmp = await CallAction<bool>("toggleAutomaticReconnect", null);
-
-            return tmp;
+            return await CallAction<bool>("toggleAutomaticReconnect");
         }
 
         /// <summary>
@@ -29,9 +24,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<bool> ToggleDownloadSpeedLimit()
         {
-            var tmp = await CallAction<bool>("toggleDownloadSpeedLimit", null);
-
-            return tmp;
+            return await CallAction<bool>("toggleDownloadSpeedLimit");
         }
 
         /// <summary>
@@ -40,10 +33,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<StatusObject> GetStatus()
         {
-            var tmp = await CallAction<DefaultReturnObject>("getStatus", null);
-
-            var data = (JObject)tmp?.Data;
-            return data?.ToObject<StatusObject>();
+            return await CallAction<StatusObject>("getStatus");
         }
     }
 }

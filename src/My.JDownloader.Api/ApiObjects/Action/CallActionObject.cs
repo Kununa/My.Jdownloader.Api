@@ -5,7 +5,7 @@
         [Newtonsoft.Json.JsonProperty(PropertyName = "url")]
         public string Url { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "params")]
-        public object Params { get; set; }
+        public object? Params { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName ="rid")]
         public long RequestId { get; set; }
         [Newtonsoft.Json.JsonProperty(PropertyName = "ApiVer")]

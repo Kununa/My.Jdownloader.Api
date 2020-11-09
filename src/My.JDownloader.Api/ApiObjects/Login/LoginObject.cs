@@ -14,8 +14,8 @@
         public string Password { get; set; }
 
         [Newtonsoft.Json.JsonIgnore]
-        public byte[] ServerEncryptionToken;
+        public byte[]? ServerEncryptionToken;
         [Newtonsoft.Json.JsonIgnore]
-        public byte[] DeviceEncryptionToken;
+        public byte[]? DeviceEncryptionToken;
     }
 }

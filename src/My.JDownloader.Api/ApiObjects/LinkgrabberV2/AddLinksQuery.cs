@@ -39,6 +39,7 @@ namespace My.JDownloader.Api.ApiObjects.LinkgrabberV2
             Autostart = null;
             DeepDecrypt = null;
             OverwritePackagizerRules = null;
+            Priority = Enums.PriorityType.DEFAULT;
         }
     }
 }

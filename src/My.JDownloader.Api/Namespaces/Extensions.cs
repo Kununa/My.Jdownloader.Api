@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Extensions;
@@ -61,7 +60,7 @@ namespace My.JDownloader.Api.Namespaces
         {
             var json = JsonConvert.SerializeObject(requestObject);
             var param = new[] { json };
-            var response = await CallAction<IReadOnlyList<ExtensionResponseObject>>("list", param);
+            var response = await CallAction<List<ExtensionResponseObject>>("list", param);
 
             return response;
 
@@ -78,7 +77,7 @@ namespace My.JDownloader.Api.Namespaces
             var param = new[] { className, enabled.ToString() };
             var response = await CallAction<DefaultReturnObject>("setEnabled", param);
 
-            return response?.Data != null;
+            return response.Data != null;
         }
     }
 }

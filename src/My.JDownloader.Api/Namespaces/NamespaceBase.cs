@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web;
+using Fody;
 using My.JDownloader.Api.ApiObjects.Action;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Login;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 
 namespace My.JDownloader.Api.Namespaces
 {
+    [ConfigureAwait(false)]
     public class NamespaceBase
     {
         private readonly DeviceObject device;
@@ -21,12 +23,12 @@ namespace My.JDownloader.Api.Namespaces
             this.baseUrl = baseUrl;
         }
 
-        protected async Task<T> CallAction<T>(string action, object param, bool eventListener = false)
+        protected async Task<T> CallAction<T>(string action, object? param = null, bool eventListener = false) where T : new()
         {
             return await Utils.CallAction<T>(device, loginObject, "/" + baseUrl + "/" + action, param, eventListener);
         }
 
-        protected async Task<T> CallEventAction<T>(string action, object param, bool eventListener = false)
+        protected async Task<T> CallEventAction<T>(string action, object? param, bool eventListener = false)where T : new()
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device), "The device can't be null.");
@@ -44,20 +46,20 @@ namespace My.JDownloader.Api.Namespaces
 
             var url = Utils.ApiUrl + query;
             var json = JsonConvert.SerializeObject(callActionObject);
-            var encryptedJson = Utils.Encrypt(json, loginObject.DeviceEncryptionToken);
+            var encryptedJson = await Utils.Encrypt(json, loginObject.DeviceEncryptionToken);
             var encryptedResponse = await Utils.PostMethod(url, encryptedJson, eventListener);
 
             if (encryptedResponse == null)
-                return default;
+                return new T();
 
-            var decryptedResponse = Utils.Decrypt(encryptedResponse, loginObject.DeviceEncryptionToken);
+            var decryptedResponse = await Utils.Decrypt(encryptedResponse, loginObject.DeviceEncryptionToken);
             if (decryptedResponse == null)
-                return default;
+                return new T();
 
             //special case as event responses are completly differerent
             if (decryptedResponse.Contains("subscriptionid"))
             {
-                var direct = (T)JsonConvert.DeserializeObject(decryptedResponse, typeof(T));
+                var direct = JsonConvert.DeserializeObject<T>(decryptedResponse);
                 if (direct != null)
                     return direct;
             }

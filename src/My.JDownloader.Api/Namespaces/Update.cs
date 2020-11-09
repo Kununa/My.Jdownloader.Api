@@ -1,5 +1,4 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects.Devices;
+﻿using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Login;
 
@@ -15,8 +14,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if an update is available.</returns>
         public async Task<bool> IsUpdateAvailable()
         {
-            var response = await CallAction<bool>("isUpdateAvailable", null);
-
+            var response = await CallAction<bool>("isUpdateAvailable");
             return response;
         }
 
@@ -25,7 +23,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartAndUpdate()
         {
-            await CallAction<object>("restartAndUpdate", null);
+            await CallAction<object>("restartAndUpdate");
         }
 
         /// <summary>
@@ -33,7 +31,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RunUpdateCheck()
         {
-            await CallAction<object>("runUpdateCheck", null);
+            await CallAction<object>("runUpdateCheck");
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.System;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task ExitJd()
         {
-            await CallAction<object>("exitJD", null);
+            await CallAction<object>("exitJD");
         }
 
         /// <summary>
@@ -27,9 +26,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<StorageInfoReturnObject>> GetStorageInfos(string path)
         {
             var param = new[] { path };
-            var tmp = await CallAction<IReadOnlyList<StorageInfoReturnObject >> ("getStorageInfos", param);
-
-            return tmp;
+            return await CallAction<List<StorageInfoReturnObject >> ("getStorageInfos", param);
         }
 
         /// <summary>
@@ -38,7 +35,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<SystemInfoReturnObject> GetSystemInfos()
         {
-            return await CallAction<SystemInfoReturnObject>("getSystemInfos", null);
+            return await CallAction<SystemInfoReturnObject>("getSystemInfos");
         }
 
         /// <summary>
@@ -46,7 +43,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task HibernateOs()
         {
-            await CallAction<object>("hibernateOS", null);
+            await CallAction<object>("hibernateOS");
         }
 
         /// <summary>
@@ -54,7 +51,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task RestartJd()
         {
-            await CallAction<object>("restartJD", null);
+            await CallAction<object>("restartJD");
         }
 
         /// <summary>
@@ -71,7 +68,7 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         public async Task StandbyOs()
         {
-            await CallAction<object>("standbyOS", null);
+            await CallAction<object>("standbyOS");
         }
     }
 }

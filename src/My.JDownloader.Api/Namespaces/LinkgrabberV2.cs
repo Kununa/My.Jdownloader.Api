@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using My.JDownloader.Api.ApiHandler;
 using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.LinkgrabberV2;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Login;
 
@@ -12,7 +10,9 @@ namespace My.JDownloader.Api.Namespaces
 {
     public class LinkGrabberV2 : NamespaceBase
     {
-        public LinkGrabberV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "linkgrabberv2") { }
+        public LinkGrabberV2(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "linkgrabberv2")
+        {
+        }
 
         /// <summary>
         /// Aborts the linkgrabber process.
@@ -30,12 +30,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Abort(long jobId)
         {
-            var param = new[] { jobId };
+            var param = new[] {jobId};
             if (jobId == -1)
                 param = null;
-
             var response = await CallAction<bool>("abort", param);
-
             return response;
         }
 
@@ -44,18 +42,16 @@ namespace My.JDownloader.Api.Namespaces
         /// </summary>
         /// <param name="type">The value can be: DLC, RSDF, CCF or CRAWLJOB</param>
         /// <param name="content">File as dataurl. https://de.wikipedia.org/wiki/Data-URL </param>
-        public async Task<bool> AddContainer(ContainerType type, string content)
+        public async Task AddContainer(ContainerType type, string content)
         {
             var containerObject = new AddContainerObject
             {
                 Type = type.ToString(),
                 Content = content
             };
-
             var json = JsonConvert.SerializeObject(containerObject);
-            var param = new[] { json };
-            var response = await CallAction<object>("addContainer", param);
-            return response != null;
+            var param = new[] {json};
+            await CallAction<object>("addContainer", param);
         }
 
         /// <summary>
@@ -84,7 +80,7 @@ namespace My.JDownloader.Api.Namespaces
             {
                 DefaultValueHandling = DefaultValueHandling.Include
             });
-            var param = new[] { json };
+            var param = new[] {json};
             var response = await CallAction<LinkCollectingJob>("addLinks", param);
             return response.Id;
         }
@@ -97,13 +93,12 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="destinationPackageId"></param>
         /// <param name="variantId"></param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> AddVariantCopy(long linkId, long destinationAfterLinkId, long destinationPackageId,
+        public async Task AddVariantCopy(long linkId, long destinationAfterLinkId, long destinationPackageId,
             string variantId)
         {
             var param = new[]
                 {linkId.ToString(), destinationAfterLinkId.ToString(), destinationPackageId.ToString(), variantId};
-            var response = await CallAction<DefaultReturnObject>("addVariantCopy", param);
-            return response != null;
+            await CallAction<DefaultReturnObject>("addVariantCopy", param);
         }
 
         /// <summary>
@@ -115,26 +110,20 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="mode">The mode type.</param>
         /// <param name="selection">The selection Type.</param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> CleanUp(long[] linkIds, long[] packageIds, CleanUpActionType action, CleanUpModeType mode,
+        public async Task CleanUp(long[] linkIds, long[] packageIds, CleanUpActionType action, CleanUpModeType mode,
             CleanUpSelectionType selection)
         {
-            var param = new object[] { linkIds, packageIds, action, mode, selection };
-            var response = await CallAction<object>("cleanUp", param);
-            if (response == null)
-                return false;
-            return true;
+            var param = new object[] {linkIds, packageIds, action, mode, selection};
+            await CallAction<object>("cleanUp", param);
         }
 
         /// <summary>
         /// Clears the downloader list.
         /// </summary>
         /// <returns>True if successfull</returns>
-        public async Task<bool> ClearList()
+        public async Task ClearList()
         {
-            var response = await CallAction<object>("clearList", null);
-            if (response == null)
-                return false;
-            return true;
+            await CallAction<object>("clearList");
         }
 
         /// <summary>
@@ -144,7 +133,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<long> GetChildrenChanged(long structureWatermark)
         {
-            var response = await CallAction<long>("getChildrenChanged", null);
+            var response = await CallAction<long>("getChildrenChanged");
 
             return response;
         }
@@ -153,10 +142,9 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the selection base of the download folder history.
         /// </summary>
         /// <returns>An array which contains the download folder history.</returns>
-        public async Task<string[]> GetDownloadFolderHistorySelectionBase()
+        public async Task<List<string>> GetDownloadFolderHistorySelectionBase()
         {
-            var response = await CallAction<string[]>("getDownloadFolderHistorySelectionBase", null);
-
+            var response = await CallAction<List<string>>("getDownloadFolderHistorySelectionBase");
             return response;
         }
 
@@ -170,7 +158,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns></returns>
         public async Task<IReadOnlyDictionary<string, IReadOnlyList<long>>> GetDownloadUrls(long[] links, long afterLinkId, long destPackageId)
         {
-            var response = await CallAction<IReadOnlyDictionary<string, IReadOnlyList<long>>>("getDownloadUrls", null);
+            var response = await CallAction<Dictionary<string, IReadOnlyList<long>>>("getDownloadUrls");
             return response;
         }
 
@@ -180,7 +168,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The amount of links which are in the linkcollector.</returns>
         public async Task<int> GetPackageCount()
         {
-            var response = await CallAction<int>("getPackageCount", null);
+            var response = await CallAction<int>("getPackageCount");
             return response;
         }
 
@@ -191,7 +179,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns variants of this link.</returns>
         public async Task<IReadOnlyList<GetVariantsReturnObject>> GetVariants(long linkId)
         {
-            var response = await CallAction<IReadOnlyList<GetVariantsReturnObject>>("getVariants", null);
+            var response = await CallAction<List<GetVariantsReturnObject>>("getVariants");
             return response;
         }
 
@@ -201,8 +189,8 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns true or false. Depending on if the client is still collecting files.</returns>
         public async Task<bool> IsCollecting()
         {
-            var response = await CallAction<object>("isCollection", null);
-            return response != null;
+            var response = await CallAction<bool>("isCollection");
+            return response;
         }
 
         /// <summary>
@@ -212,12 +200,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="afterLinkId">The id of the link you want to move the other links to.</param>
         /// <param name="destPackageId">The id of the package where you want to add the links to.</param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> MoveLinks(long[] linkIds, long? afterLinkId, long destPackageId)
+        public async Task MoveLinks(long[] linkIds, long? afterLinkId, long destPackageId)
         {
-            var param = new object[] { linkIds, afterLinkId, destPackageId };
-
-            var response = await CallAction<object>("moveLinks", param);
-            return response != null;
+            var param = new object[] {linkIds, afterLinkId, destPackageId};
+            await CallAction<object>("moveLinks", param);
         }
 
         /// <summary>
@@ -226,12 +212,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="packageIds">The ids of the packages you want to move.</param>
         /// <param name="afterDestPackageId">The id of the package you want to move the others to.</param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> MovePackages(long[] packageIds, long afterDestPackageId)
+        public async Task MovePackages(long[] packageIds, long afterDestPackageId)
         {
-            var param = new object[] { packageIds, afterDestPackageId };
-
-            var response = await CallAction<object>("movePackages", param);
-            return response != null;
+            var param = new object[] {packageIds, afterDestPackageId};
+            await CallAction<object>("movePackages", param);
         }
 
         /// <summary>
@@ -240,12 +224,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="linkIds">The ids of the links you want to move.</param>
         /// <param name="packageIds">The ids of the packages you want to move.</param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> MoveToDownloadlist(long[] linkIds, long[] packageIds)
+        public async Task MoveToDownloadlist(long[] linkIds, long[] packageIds)
         {
-            var param = new[] { linkIds, packageIds };
-
-            var response = await CallAction<object>("moveToDownloadlist", param);
-            return response != null;
+            var param = new[] {linkIds, packageIds};
+            await CallAction<object>("moveToDownloadlist", param);
         }
 
         /// <summary>
@@ -256,12 +238,10 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="newPackageName">The name of the new package.</param>
         /// <param name="downloadPath">The download path.</param>
         /// <returns>True if successfull.</returns>
-        public async Task<bool> MoveToNewPackage(long[] linkIds, long[] packageIds, string newPackageName, string downloadPath)
+        public async Task MoveToNewPackage(long[] linkIds, long[] packageIds, string newPackageName, string downloadPath)
         {
-            var param = new object[] { linkIds, packageIds, newPackageName, downloadPath };
-
-            var response = await CallAction<object>("movetoNewPackage", param);
-            return response != null;
+            var param = new object[] {linkIds, packageIds, newPackageName, downloadPath};
+            await CallAction<object>("movetoNewPackage", param);
         }
 
         /// <summary>
@@ -271,9 +251,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<QueryLinksResponseObject>> QueryLinks(CrawledLinkQuery query)
         {
             var json = JsonConvert.SerializeObject(query);
-            var param = new[] { json };
-
-            var response = await CallAction<IReadOnlyList<QueryLinksResponseObject>>("queryLinks", param);
+            var param = new[] {json};
+            var response = await CallAction<List<QueryLinksResponseObject>>("queryLinks", param);
             return response;
         }
 
@@ -285,9 +264,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<CrawledPackage>> QueryPackages(CrawledPackageQuery requestObject)
         {
             var json = JsonConvert.SerializeObject(requestObject);
-            var param = new[] { json };
-
-            var response = await CallAction<IReadOnlyList<CrawledPackage>>("queryPackages", param);
+            var param = new[] {json};
+            var response = await CallAction<List<CrawledPackage>>("queryPackages", param);
             return response;
         }
 
@@ -297,18 +275,16 @@ namespace My.JDownloader.Api.Namespaces
         /// <param name="directory">The new download directory.</param>
         /// <param name="packageIds">The ids of the packages.</param>
         /// <returns>True if successfull</returns>
-        public async Task<bool> SetDownloadDirectory(string directory, long[] packageIds)
+        public async Task SetDownloadDirectory(string directory, long[] packageIds)
         {
-            var param = new object[] { directory, packageIds };
-            var response = await CallAction<object>("setDownloadDirectory", param);
-            return response != null;
+            var param = new object[] {directory, packageIds};
+            await CallAction<object>("setDownloadDirectory", param);
         }
 
-        public async Task<bool> RemoveLinks(long[] linkIds, long[] packageIds)
+        public async Task RemoveLinks(long[] linkIds, long[] packageIds)
         {
-            var param = new object[] { linkIds, packageIds };
-            var response = await CallAction<object>("removeLinks", param);
-            return response != null;
+            var param = new object[] {linkIds, packageIds};
+            await CallAction<object>("removeLinks", param);
         }
     }
 }

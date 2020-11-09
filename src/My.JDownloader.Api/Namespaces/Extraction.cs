@@ -1,5 +1,4 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects.Devices;
+﻿using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Extraction;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,14 +47,14 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<ArchiveSettings>> GetArchiveSettings(string[] archiveIds)
         {
             var param = new[] { archiveIds };
-            var response = await CallAction<IReadOnlyList<ArchiveSettings>>("cancelExtraction", param);
+            var response = await CallAction<List<ArchiveSettings>>("cancelExtraction", param);
 
             return response;
         }
 
         public async Task<IReadOnlyList<ArchiveStatus>> GetQueue()
         {
-            var response = await CallAction<IReadOnlyList<ArchiveStatus>>("cancelExtraction", null);
+            var response = await CallAction<List<ArchiveStatus>>("cancelExtraction");
             return response;
         }
 
@@ -70,7 +69,7 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyDictionary<string, bool>> StartExtractionNow(long[] linkIds, long[] packageIds)
         {
             var param = new[] { linkIds, packageIds };
-            var response = await CallAction<IReadOnlyDictionary<string, bool>>("cancelExtraction", param);
+            var response = await CallAction<Dictionary<string, bool>>("cancelExtraction", param);
 
             return response;
         }

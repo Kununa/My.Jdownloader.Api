@@ -1,5 +1,4 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects.Devices;
+﻿using My.JDownloader.Api.ApiObjects.Devices;
 using My.JDownloader.Api.ApiObjects.Events;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ namespace My.JDownloader.Api.Namespaces
     public class Events : NamespaceBase
     {
 
-        public List<long> SubscriptionIDs;
+        public readonly List<long> SubscriptionIDs;
 
         public Events(DeviceObject device, LoginObject loginObject) : base(device, loginObject, "events")
         {
@@ -31,10 +30,9 @@ namespace My.JDownloader.Api.Namespaces
             return response;
         }
 
-        public async Task<SubscriptionResponse> Subscribe(string[] subscriptions = null, string[] exclusions = null)
+        public async Task<SubscriptionResponse> Subscribe(string[]? subscriptions = null, string[]? exclusions = null)
         {
-            if (exclusions == null)
-                exclusions = new string[0];
+            exclusions ??= global::System.Array.Empty<string>();
             var param = new object[] { new[] { "STOPPED" }, exclusions };
             var response = await CallAction<SubscriptionResponse>("subscribe", param);
             if (!SubscriptionIDs.Contains(response.SubscriptionId))
@@ -46,8 +44,8 @@ namespace My.JDownloader.Api.Namespaces
         public async Task<IReadOnlyList<SubscriptionEventObject>> Listen(long subscriptionid)
         {
             var param = new object[] { subscriptionid };
-            var response = await CallAction<IReadOnlyList<SubscriptionEventObject>>("listen", param, true);
-            return response ?? new SubscriptionEventObject[0];
+            var response = await CallAction<List<SubscriptionEventObject>>("listen", param, true);
+            return response;
         }
 
         public async Task<SubscriptionResponse> ChangeSubscriptionTimeouts(long subscriptionid, long polltimeout, long maxkeepalive)
@@ -76,8 +74,7 @@ namespace My.JDownloader.Api.Namespaces
 
         public async Task<IReadOnlyList<PublisherResponse>> ListPublisher()
         {
-            var response = await CallEventAction<IReadOnlyList<PublisherResponse>>("listpublisher", null);
-
+            var response = await CallEventAction<List<PublisherResponse>>("listpublisher", null);
             return response;
         }
     }

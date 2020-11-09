@@ -1,5 +1,4 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects.Devices;
+﻿using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Login;
 
@@ -12,10 +11,9 @@ namespace My.JDownloader.Api.Namespaces
         /// <summary>
         /// Keep an eye on your JDownloader Client ;)
         /// </summary>
-        public async Task<bool> DoSomethingCool()
+        public async Task DoSomethingCool()
         {
-            var response = await CallAction<object>("doSomethingCool", null);
-            return response != null;
+            await CallAction<object>("doSomethingCool");
         }
 
         /// <summary>
@@ -24,8 +22,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>Returns the core revision of the jdownloader client.</returns>
         public async Task<int> GetCoreRevision()
         {
-            var response = await CallAction<int>("getCoreRevision", null);
-
+            var response = await CallAction<int>("getCoreRevision");
             return response;
         }
 
@@ -35,8 +32,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> RefreshPlugins()
         {
-            var response = await CallAction<bool>("refreshPlugins", null);
-
+            var response = await CallAction<bool>("refreshPlugins");
             return response;
         }
 
@@ -50,7 +46,6 @@ namespace My.JDownloader.Api.Namespaces
         {
             var param = new[] { a, b };
             var response = await CallAction<int>("sum", param);
-
             return response;
         }
 
@@ -60,8 +55,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current uptime of the JDownloader client as long.</returns>
         public async Task<long> Uptime()
         {
-            var response = await CallAction<long>("uptime", null);
-
+            var response = await CallAction<long>("uptime");
             return response;
         }
 
@@ -71,8 +65,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The current version of the JDownloader client.</returns>
         public async Task<long> Version()
         {
-            var response = await CallAction<long>("version", null);
-
+            var response = await CallAction<long>("version");
             return response;
         }
     }

@@ -1,5 +1,4 @@
-﻿using My.JDownloader.Api.ApiHandler;
-using My.JDownloader.Api.ApiObjects;
+﻿using My.JDownloader.Api.ApiObjects;
 using My.JDownloader.Api.ApiObjects.Devices;
 using System.Threading.Tasks;
 using My.JDownloader.Api.ApiObjects.Login;
@@ -27,12 +26,10 @@ namespace My.JDownloader.Api.Namespaces
         /// Gets the current state of the device
         /// </summary>
         /// <returns>The current state of the device.</returns>
-        public async Task<string> GetCurrentState()
+        public async Task<string?> GetCurrentState()
         {
-            var result = await CallAction<string>("getCurrentState", null);
-            if (result != null)
-                return result;
-            return "UNKOWN_STATE";
+            var result = await CallAction<object>("getCurrentState");
+            return !string.IsNullOrEmpty(result.ToString()) ? result.ToString() : "UNKOWN_STATE";
         }
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>The actual download speed.</returns>
         public async Task<long> GetSpeedInBps()
         {
-            var result = await CallAction<long>("getSpeedInBps", null);
+            var result = await CallAction<long>("getSpeedInBps");
             return result;
         }
 
@@ -51,7 +48,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Start()
         {
-            var result = await CallAction<bool>("start", null);
+            var result = await CallAction<bool>("start");
             return result;
         }
 
@@ -61,7 +58,7 @@ namespace My.JDownloader.Api.Namespaces
         /// <returns>True if successfull.</returns>
         public async Task<bool> Stop()
         {
-            var result = await CallAction<bool>("stop", null);
+            var result = await CallAction<bool>("stop");
             return result;
         }
 
